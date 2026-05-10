@@ -2,6 +2,9 @@ import { useState } from 'react'
 import Icon from './Icon'
 import DonorApp from './DonorApp'
 import AdminApp from './AdminApp'
+import LandingPage from './LandingPage'
+import LearnMorePage from './LearnMorePage'
+import GetStartedPage from './GetStartedPage'
 
 function ViewToggle({ view, setView }) {
   return (
@@ -25,12 +28,35 @@ function ViewToggle({ view, setView }) {
 }
 
 export default function App() {
+  const [page, setPage] = useState("landing");
   const [view, setView] = useState("donor");
+
+  if (page === "landing") return (
+    <LandingPage
+      onGetStarted={() => setPage("getstarted")}
+      onLearnMore={() => setPage("learnmore")}
+    />
+  );
+
+  if (page === "learnmore") return (
+    <LearnMorePage
+      onBack={() => setPage("landing")}
+      onGetStarted={() => setPage("getstarted")}
+    />
+  );
+
+  if (page === "getstarted") return (
+    <GetStartedPage
+      onBack={() => setPage("landing")}
+      onEnterApp={() => setPage("app")}
+    />
+  );
+
   const AppView = view === "donor" ? DonorApp : AdminApp;
   return (
     <>
       <ViewToggle view={view} setView={setView} />
-      <AppView />
+      <AppView onSignOut={() => setPage("landing")} />
     </>
   );
 }

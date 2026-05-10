@@ -10,7 +10,23 @@ const NAV_DONOR = [
   { key: "profile", label: "Profile", icon: "profile" },
 ];
 
-function DonorSidebar({ active, setActive }) {
+function SignOutModal({ onConfirm, onCancel }) {
+  return (
+    <div className="overlay" onClick={onCancel}>
+      <div className="modal" onClick={e => e.stopPropagation()}>
+        <h2>Sign out?</h2>
+        <p className="subtitle">You'll be taken back to the NeedFeed home page.</p>
+        <div className="footer">
+          <button className="btn outline" onClick={onCancel}>Cancel</button>
+          <button className="btn coral" onClick={onConfirm}><Icon name="logout" size={14}/> Sign out</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DonorSidebar({ active, setActive, onSignOut }) {
+  const [confirming, setConfirming] = useState(false);
   return (
     <aside className="sidebar">
       <div className="brand">
@@ -38,8 +54,9 @@ function DonorSidebar({ active, setActive }) {
             <div className="role">Donor since Feb 2025</div>
           </div>
         </div>
-        <button className="signOut"><Icon name="logout" size={14}/> Sign out</button>
+        <button className="signOut" onClick={() => setConfirming(true)}><Icon name="logout" size={14}/> Sign out</button>
       </div>
+      {confirming && <SignOutModal onConfirm={onSignOut} onCancel={() => setConfirming(false)} />}
     </aside>
   );
 }
@@ -598,7 +615,7 @@ function DonorProfile() {
   );
 }
 
-export default function DonorApp() {
+export default function DonorApp({ onSignOut }) {
   const [active, setActive] = useState("home");
   const [selectedHome, setSelectedHome] = useState(null);
   const [pledgeCtx, setPledgeCtx] = useState(null);
@@ -621,7 +638,7 @@ export default function DonorApp() {
 
   return (
     <div className="app">
-      <DonorSidebar active={navKey} setActive={navTo} />
+      <DonorSidebar active={navKey} setActive={navTo} onSignOut={onSignOut} />
       <main className="main">{screen}</main>
     </div>
   );

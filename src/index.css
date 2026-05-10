@@ -2,27 +2,27 @@
 :root {
   /* Brand */
   --teal: #1D9E75;
-  --teal-dark: #25c492;
-  --teal-darker: #1a9470;
-  --teal-light: #0d2e22;
-  --teal-tint: #0a1f18;
-  --coral: #e8674a;
-  --coral-light: #2e1a14;
-  --amber: #f0a830;
-  --amber-light: #2a2010;
-  --green: #7ab52a;
-  --green-light: #1a2710;
+  --teal-dark: #0F6E56;
+  --teal-darker: #0a4f3e;
+  --teal-light: #E1F5EE;
+  --teal-tint: #F2FAF6;
+  --coral: #D85A30;
+  --coral-light: #FBE7DE;
+  --amber: #EF9F27;
+  --amber-light: #FCEFD4;
+  --green: #639922;
+  --green-light: #E8F1D7;
 
-  /* Neutrals — dark */
-  --ink: #e8ede8;
-  --ink-2: #b8c4be;
-  --ink-3: #7a8f88;
-  --ink-4: #4a5c55;
-  --line: #2a3530;
-  --line-2: #222e28;
-  --bg: #111816;
-  --bg-2: #182220;
-  --surface: #1e2a26;
+  /* Neutrals — warm */
+  --ink: #1B2421;
+  --ink-2: #3A4945;
+  --ink-3: #6B7A75;
+  --ink-4: #97A29D;
+  --line: #E6E9E6;
+  --line-2: #EFF1EE;
+  --bg: #FBFAF6;
+  --bg-2: #F5F4EE;
+  --surface: #FFFFFF;
 
   /* Type */
   --serif: "Newsreader", "Iowan Old Style", Georgia, serif;
@@ -33,9 +33,9 @@
   --radius: 12px;
   --radius-lg: 18px;
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.2);
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 8px 24px -12px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 12px 40px -12px rgba(0, 0, 0, 0.6);
+  --shadow-sm: 0 1px 2px rgba(15, 36, 30, 0.05), 0 0 0 1px rgba(15, 36, 30, 0.04);
+  --shadow: 0 1px 2px rgba(15, 36, 30, 0.04), 0 8px 24px -12px rgba(15, 36, 30, 0.10);
+  --shadow-lg: 0 12px 40px -12px rgba(15, 36, 30, 0.18);
 }
 
 * { box-sizing: border-box; }
@@ -114,7 +114,7 @@ input:focus, textarea:focus, select:focus {
   transition: color .12s, background .12s;
 }
 .viewToggle button.active {
-  background: var(--teal);
+  background: var(--ink);
   color: #fff;
 }
 .viewToggle button:not(.active):hover { color: var(--ink); }
@@ -330,10 +330,10 @@ input:focus, textarea:focus, select:focus {
 .stat .delta { font-size: 12px; color: var(--ink-3); margin-top: 6px; }
 .stat .delta.up { color: var(--teal-dark); }
 .stat .delta.down { color: var(--coral); }
-.stat.featured { background: var(--teal); color: #fff; border-color: var(--teal); }
-.stat.featured .label { color: rgba(255,255,255,0.75); }
+.stat.featured { background: var(--ink); color: #fff; border-color: var(--ink); }
+.stat.featured .label { color: rgba(255,255,255,0.7); }
 .stat.featured .value { color: #fff; }
-.stat.featured .delta { color: rgba(255,255,255,0.75); }
+.stat.featured .delta { color: rgba(255,255,255,0.7); }
 .stat .ico {
   position: absolute;
   top: 16px; right: 16px;
@@ -436,8 +436,8 @@ input:focus, textarea:focus, select:focus {
 }
 .pill:hover { border-color: var(--ink-3); }
 .pill.active {
-  background: var(--teal);
-  border-color: var(--teal);
+  background: var(--ink);
+  border-color: var(--ink);
   color: #fff;
 }
 .pill .count {

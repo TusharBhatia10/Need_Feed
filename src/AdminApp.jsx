@@ -10,7 +10,23 @@ const NAV_ADMIN = [
   { key: "profile", label: "Home Profile", icon: "settings" },
 ];
 
-function AdminSidebar({ active, setActive }) {
+function SignOutModal({ onConfirm, onCancel }) {
+  return (
+    <div className="overlay" onClick={onCancel}>
+      <div className="modal" onClick={e => e.stopPropagation()}>
+        <h2>Sign out?</h2>
+        <p className="subtitle">You'll be taken back to the NeedFeed home page.</p>
+        <div className="footer">
+          <button className="btn outline" onClick={onCancel}>Cancel</button>
+          <button className="btn coral" onClick={onConfirm}><Icon name="logout" size={14}/> Sign out</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AdminSidebar({ active, setActive, onSignOut }) {
+  const [confirming, setConfirming] = useState(false);
   return (
     <aside className="sidebar">
       <div className="brand">
@@ -38,8 +54,9 @@ function AdminSidebar({ active, setActive }) {
             <div className="role">Anuradha Pillai · Admin</div>
           </div>
         </div>
-        <button className="signOut"><Icon name="logout" size={14}/> Sign out</button>
+        <button className="signOut" onClick={() => setConfirming(true)}><Icon name="logout" size={14}/> Sign out</button>
       </div>
+      {confirming && <SignOutModal onConfirm={onSignOut} onCancel={() => setConfirming(false)} />}
     </aside>
   );
 }
@@ -487,7 +504,7 @@ function HomeProfileEdit() {
   );
 }
 
-export default function AdminApp() {
+export default function AdminApp({ onSignOut }) {
   const [active, setActive] = useState("dashboard");
   let screen = null;
   if (active === "dashboard") screen = <AdminDashboard go={setActive}/>;
@@ -497,7 +514,7 @@ export default function AdminApp() {
   else if (active === "profile") screen = <HomeProfileEdit/>;
   return (
     <div className="app">
-      <AdminSidebar active={active} setActive={setActive}/>
+      <AdminSidebar active={active} setActive={setActive} onSignOut={onSignOut}/>
       <main className="main dense">{screen}</main>
     </div>
   );
