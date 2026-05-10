@@ -235,7 +235,6 @@ function NeedsBoard() {
           <h1>Needs board</h1>
           <div className="sub">Add, edit and prioritise your home&apos;s supply requests.</div>
         </div>
-        <button className="btn teal" onClick={() => setAdding(true)}><Icon name="plus" size={14}/> Add new need</button>
       </div>
 
       <div className="toolbar">
@@ -245,6 +244,7 @@ function NeedsBoard() {
           <button className={"pill " + (filter==="partial"?"active":"")} onClick={() => setFilter("partial")}>Partial <span className="count">{counts.partial}</span></button>
           <button className={"pill " + (filter==="covered"?"active":"")} onClick={() => setFilter("covered")}>Covered <span className="count">{counts.covered}</span></button>
         </div>
+        <button className="btn teal" onClick={() => setAdding(true)} style={{marginLeft:"auto"}}><Icon name="plus" size={14}/> Add new need</button>
       </div>
 
       {adding && (

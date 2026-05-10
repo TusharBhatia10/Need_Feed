@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import Icon from './Icon'
+import DatePicker from './DatePicker'
 import { initials, HOMES, RECENT_DONORS, DONOR_PLEDGES } from './data'
 
 const NAV_DONOR = [
@@ -344,30 +345,81 @@ function DonorHomeProfile({ home, back, openPledge }) {
   );
 }
 
-function PledgeForm({ ctx, onClose }) {
-  const [step, setStep] = useState("form");
-  const [qty, setQty] = useState("");
+function MethodCard({ icon, title, desc, tag, tagTone, active, disabled, onClick }) {
+  return (
+    <button type="button" onClick={disabled ? undefined : onClick} style={{
+      appearance:"none", textAlign:"left", cursor: disabled ? "not-allowed" : "pointer",
+      background: active ? "var(--teal-tint)" : "var(--surface)",
+      border: "1.5px solid " + (active ? "var(--teal)" : "var(--line)"),
+      borderRadius:"var(--radius)", padding:16, display:"flex", gap:14,
+      opacity: disabled ? 0.55 : 1, transition:"all .12s", width:"100%",
+      boxShadow: active ? "0 0 0 3px rgba(29,158,117,0.15)" : "none",
+    }}>
+      <div style={{
+        width:40, height:40, borderRadius:10, flexShrink:0,
+        background: active ? "var(--teal)" : "var(--bg-2)",
+        color: active ? "#fff" : "var(--ink-2)",
+        display:"grid", placeItems:"center",
+      }}>
+        <Icon name={icon} size={20}/>
+      </div>
+      <div style={{flex:1, minWidth:0}}>
+        <div className="row between" style={{alignItems:"flex-start", gap:8}}>
+          <div style={{fontFamily:"var(--serif)", fontSize:17, fontWeight:600, lineHeight:1.2}}>{title}</div>
+          {tag && <span className={"badge " + (tagTone || "")} style={{flexShrink:0}}>{tag}</span>}
+        </div>
+        <div style={{fontSize:12.5, color:"var(--ink-3)", marginTop:6, lineHeight:1.5}}>{desc}</div>
+      </div>
+    </button>
+  );
+}
+
+function PledgeForm({ ctx, onClose, openPledge }) {
+  const [step, setStep] = useState("details");
+  const [qty, setQty] = useState(ctx.qty || "");
   const [unit, setUnit] = useState(ctx.unit || "kg");
+  const [method, setMethod] = useState(null);
+  const [platform, setPlatform] = useState("Blinkit");
   const [date, setDate] = useState("2026-05-12");
+  const [slot, setSlot] = useState("Morning (9am–12pm)");
   const [note, setNote] = useState("");
 
+  const home = ctx.home;
+  const itemName = ctx.itemName;
+  const address = (home && home.address) || "23, Link Road, Andheri West, Mumbai — 400053";
+  const contact = (home && home.contact) ? home.contact + ", " + home.phone : "Meera Joshi, +91 98765 43210";
+
+  const goBack = () => {
+    if (step === "details") onClose();
+    else if (step === "method") setStep("details");
+    else if (step === "order" || step === "drop") setStep("method");
+    else onClose();
+  };
+
   if (step === "success") {
+    const methodLabel = method === "order" ? `Order & Deliver via ${platform}` : "Drop off myself";
+    const expected = method === "order" ? `Via ${platform}` : date;
     return (
       <div className="pledgeWrap success fadeIn">
-        <div className="card" style={{padding:"36px 28px"}}>
+        <div className="card" style={{padding:"36px 28px", textAlign:"center"}}>
           <div className="checkBig"><Icon name="checkBig" size={36}/></div>
-          <h1 style={{fontSize:28}}>Pledge confirmed.</h1>
-          <p className="muted" style={{marginTop:8, fontSize:14}}>Thank you, Tushar. {ctx.home.name} has been notified.</p>
-          <div className="card" style={{textAlign:"left", marginTop:22, padding:18, background:"var(--bg-2)", border:"1px dashed var(--line)"}}>
-            <div className="row between"><span className="muted">Home</span><span style={{fontWeight:600}}>{ctx.home.name}</span></div>
+          <h1 style={{fontSize:28}}>Pledge confirmed!</h1>
+          <p className="muted" style={{marginTop:8, fontSize:14}}>Thank you, Tushar. {home.name} has been notified.</p>
+          <div style={{textAlign:"left", marginTop:22, padding:18, background:"var(--teal-tint)", border:"1px solid var(--teal-light)", borderRadius:"var(--radius)"}}>
+            <div className="row between"><span className="muted">Item</span><span style={{fontWeight:600}}>{itemName} · {qty} {unit}</span></div>
             <div className="divider" style={{margin:"10px 0"}}/>
-            <div className="row between"><span className="muted">Item</span><span style={{fontWeight:600}}>{ctx.itemName}</span></div>
+            <div className="row between"><span className="muted">Home</span><span style={{fontWeight:600}}>{home.name}, {home.area}</span></div>
             <div className="divider" style={{margin:"10px 0"}}/>
-            <div className="row between"><span className="muted">Quantity</span><span style={{fontWeight:600}}>{qty} {unit}</span></div>
+            <div className="row between"><span className="muted">Method</span><span style={{fontWeight:600}}>{methodLabel}</span></div>
             <div className="divider" style={{margin:"10px 0"}}/>
-            <div className="row between"><span className="muted">Drop-off</span><span style={{fontWeight:600}}>{date}</span></div>
+            <div className="row between"><span className="muted">Expected delivery</span><span style={{fontWeight:600}}>{expected}</span></div>
           </div>
-          <button className="btn teal lg" style={{marginTop:22}} onClick={onClose}>Back to home</button>
+          <div className="row" style={{justifyContent:"center", gap:10, marginTop:22}}>
+            <button className="btn teal lg" onClick={onClose}>Back to home</button>
+            <button className="btn lg" style={{background:"#25D366", borderColor:"#25D366"}}>
+              <Icon name="phone" size={14}/> Share on WhatsApp
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -375,59 +427,158 @@ function PledgeForm({ ctx, onClose }) {
 
   return (
     <div className="pledgeWrap fadeIn">
-      <button className="linkBtn" onClick={onClose} style={{marginBottom:14, display:"inline-flex", alignItems:"center", gap:6}}>
-        <Icon name="back" size={14}/> Cancel
+      <button className="linkBtn" onClick={goBack} style={{marginBottom:14, display:"inline-flex", alignItems:"center", gap:6}}>
+        <Icon name="back" size={14}/> {step === "details" ? "Cancel" : "Back"}
       </button>
+
+      {/* Step progress bar */}
+      <div className="row" style={{gap:8, marginBottom:18}}>
+        {["details","method","confirm"].map((s, i) => {
+          const idx = step === "details" ? 0 : step === "method" ? 1 : 2;
+          return <div key={s} style={{flex:1, height:4, borderRadius:2, background: i <= idx ? "var(--teal)" : "var(--line)"}}/>;
+        })}
+      </div>
+
       <div className="card" style={{padding:"26px 28px"}}>
-        <h1 style={{fontSize:26}}>Pledge a donation</h1>
-        <p className="muted" style={{marginTop:6, marginBottom:20, fontSize:13.5}}>You&apos;re committing to drop off these supplies on the date below.</p>
-
-        <div className="formField">
-          <label>Item</label>
-          <div className="readonly">{ctx.itemName}</div>
-        </div>
-        <div className="formField">
-          <label>Home</label>
-          <div className="readonly">{ctx.home.name} · {ctx.home.area}</div>
-        </div>
-        <div className="formField">
-          <label>Quantity to donate</label>
-          <div className="qtyInput">
-            <input type="number" placeholder="e.g. 10" value={qty} onChange={e => setQty(e.target.value)} />
-            <select value={unit} onChange={e => setUnit(e.target.value)}>
-              <option value="kg">kg</option>
-              <option value="L">litres</option>
-              <option value="packets">packets</option>
-              <option value="pieces">pieces</option>
-            </select>
+        {/* Step 1 — Details */}
+        {step === "details" && <>
+          <h1 style={{fontSize:26}}>Pledge a donation</h1>
+          <p className="muted" style={{marginTop:6, marginBottom:20, fontSize:13.5}}>Confirm what you&apos;d like to donate.</p>
+          <div className="formField"><label>Home</label><div className="readonly">{home.name} · {home.area}</div></div>
+          <div className="formField"><label>Item</label><div className="readonly">{itemName}</div></div>
+          <div className="formField"><label>Unit</label><div className="readonly">{unit}</div></div>
+          <div className="formField">
+            <label>Quantity to donate</label>
+            <input type="number" placeholder="Enter quantity" value={qty} onChange={e => setQty(e.target.value)}/>
+            {ctx.needed && <div className="hint">{ctx.pledged}/{ctx.needed} {unit} pledged so far · {ctx.needed - ctx.pledged} {unit} remaining</div>}
           </div>
-          {ctx.needed && <div className="hint">{ctx.pledged}/{ctx.needed} {ctx.unit} pledged so far · {ctx.needed - ctx.pledged} {ctx.unit} remaining</div>}
-        </div>
-        <div className="formField">
-          <label>Preferred drop-off date</label>
-          <input type="date" value={date} onChange={e => setDate(e.target.value)} />
-        </div>
-        <div className="formField">
-          <label>Note to the home (optional)</label>
-          <textarea rows={3} placeholder="e.g. Will arrive around 11am, please call when at gate." value={note} onChange={e => setNote(e.target.value)} />
-        </div>
+          <div className="row" style={{justifyContent:"flex-end", gap:8, marginTop:18}}>
+            <button className="btn ghost" onClick={onClose}>Cancel</button>
+            <button className="btn teal" disabled={!qty} onClick={() => setStep("method")}>
+              Next <Icon name="arrow" size={14}/>
+            </button>
+          </div>
+        </>}
 
-        <div className="row" style={{justifyContent:"flex-end", gap:8, marginTop:18}}>
-          <button className="btn ghost" onClick={onClose}>Cancel</button>
-          <button className="btn teal" disabled={!qty} onClick={() => setStep("success")}>
-            <Icon name="check" size={14}/> Confirm pledge
+        {/* Step 2 — Choose method */}
+        {step === "method" && <>
+          <h1 style={{fontSize:26}}>How would you like to deliver?</h1>
+          <p className="muted" style={{marginTop:6, marginBottom:20, fontSize:13.5}}>{itemName} · {qty} {unit} · {home.name}</p>
+          <div className="col" style={{gap:10}}>
+            <MethodCard icon="browse" title="Order & Deliver"
+              desc="We'll create a pre-filled cart on Blinkit or JioMart. You pay on their platform and it gets delivered directly to the home."
+              tag="Fastest" tagTone="pledged" active={method === "order"} onClick={() => setMethod("order")}/>
+            <MethodCard icon="pin" title="Drop off myself"
+              desc="Get the home's address and deliver the supplies in person. Perfect if you want to visit."
+              tag="Personal" tagTone="covered" active={method === "drop"} onClick={() => setMethod("drop")}/>
+            <MethodCard icon="impact" title="Pay & we handle it"
+              desc="Pay via UPI and our NGO partner will source and deliver on your behalf."
+              tag="Coming soon" tagTone="outline" active={false} disabled={true}/>
+          </div>
+          <div className="row" style={{justifyContent:"flex-end", gap:8, marginTop:18}}>
+            <button className="btn teal" disabled={!method} onClick={() => setStep(method === "order" ? "order" : "drop")}>
+              Continue <Icon name="arrow" size={14}/>
+            </button>
+          </div>
+        </>}
+
+        {/* Step 2A — Order & Deliver */}
+        {step === "order" && <>
+          <h1 style={{fontSize:24}}>Order & deliver</h1>
+          <p className="muted" style={{marginTop:6, marginBottom:20, fontSize:13.5}}>{itemName} · {qty} {unit} · {home.name}</p>
+          <div className="formField">
+            <label>Select platform</label>
+            <div className="row" style={{gap:10, marginTop:4}}>
+              {["Blinkit","JioMart","BigBasket"].map(p => (
+                <button key={p} type="button" onClick={() => setPlatform(p)} style={{
+                  flex:1, padding:"14px 8px", borderRadius:10,
+                  border:"1.5px solid " + (platform === p ? "var(--teal)" : "var(--line)"),
+                  background: platform === p ? "var(--teal-tint)" : "var(--surface)",
+                  fontWeight:600, fontSize:13.5,
+                  color: platform === p ? "var(--teal-dark)" : "var(--ink-2)",
+                  cursor:"pointer", transition:"all .12s",
+                }}>{p}</button>
+              ))}
+            </div>
+            <div className="hint">Estimated price: ₹120–150 (approximate)</div>
+          </div>
+          <div className="formField">
+            <label>Delivery address</label>
+            <div className="readonly">{address}</div>
+          </div>
+          <button className="btn teal block lg" style={{marginTop:12}} onClick={() => setStep("success")}>
+            <Icon name="arrow" size={14}/> Open cart & order
           </button>
-        </div>
+          <p className="tinyNote" style={{textAlign:"center", marginTop:10}}>After ordering, come back here and confirm your pledge</p>
+          <div className="row" style={{justifyContent:"center", marginTop:14}}>
+            <button className="linkBtn" onClick={() => setStep("method")}>← Back to method selection</button>
+          </div>
+        </>}
+
+        {/* Step 2B — Drop off myself */}
+        {step === "drop" && <>
+          <h1 style={{fontSize:24}}>Drop off yourself</h1>
+          <p className="muted" style={{marginTop:6, marginBottom:20, fontSize:13.5}}>{itemName} · {qty} {unit} · {home.name}</p>
+          <div className="formField">
+            <label>Preferred drop-off date</label>
+            <DatePicker value={date} onChange={setDate}/>
+          </div>
+          <div className="formField">
+            <label>Preferred time slot</label>
+            <div className="row" style={{gap:8, flexWrap:"wrap", marginTop:4}}>
+              {["Morning (9am–12pm)","Afternoon (12–4pm)","Evening (4–7pm)"].map(s => (
+                <button key={s} type="button" onClick={() => setSlot(s)} className={"pill " + (slot === s ? "active" : "")}>{s}</button>
+              ))}
+            </div>
+          </div>
+          <div className="formField">
+            <label>Note to the home (optional)</label>
+            <textarea rows={3} placeholder="e.g. Will drop off at 10am" value={note} onChange={e => setNote(e.target.value)}/>
+          </div>
+          <div className="formField">
+            <label>Home address</label>
+            <div className="readonly">{address}</div>
+          </div>
+          <div className="formField">
+            <label>Contact</label>
+            <div className="readonly">{contact}</div>
+          </div>
+          <div className="row" style={{justifyContent:"space-between", alignItems:"center", marginTop:18}}>
+            <button className="linkBtn" onClick={() => setStep("method")}>← Back to method selection</button>
+            <button className="btn teal" onClick={() => setStep("success")}>
+              <Icon name="check" size={14}/> Confirm Pledge
+            </button>
+          </div>
+        </>}
       </div>
     </div>
   );
 }
 
-function DonorPledges() {
+const MY_PLEDGES_SEED = [
+  { id:1, home:"Shanti Niketan Home", area:"Andheri West", item:"Atta", qty:"5 kg", unit:"kg", method:"Drop off", pledgeDate:"8 May 2026", dropDate:"12 May 2026", status:"Pledged" },
+  { id:2, home:"Aashraya Ashram", area:"Andheri West", item:"Rice", qty:"3 kg", unit:"kg", method:"Order & Deliver", pledgeDate:"5 May 2026", dropDate:"6 May 2026", status:"Delivered" },
+  { id:3, home:"Snehalaya Trust", area:"Bandra East", item:"Oil", qty:"2 L", unit:"L", method:"Drop off", pledgeDate:"3 May 2026", dropDate:"8 May 2026", status:"Pledged" },
+  { id:4, home:"Shanti Niketan Home", area:"Andheri West", item:"Dal", qty:"2 kg", unit:"kg", method:"Drop off", pledgeDate:"25 Apr 2026", dropDate:"28 Apr 2026", status:"Missed" },
+  { id:5, home:"Snehalaya Trust", area:"Bandra East", item:"Soap", qty:"10 bars", unit:"pieces", method:"Drop off", pledgeDate:"1 May 2026", dropDate:"3 May 2026", status:"Confirmed" },
+  { id:6, home:"Jeevan Dhara", area:"Dadar West", item:"Toothpaste", qty:"5 tubes", unit:"pieces", method:"Order & Deliver", pledgeDate:"20 Apr 2026", dropDate:"21 Apr 2026", status:"Confirmed" },
+  { id:7, home:"Shanti Niketan Home", area:"Andheri West", item:"Rice", qty:"4 kg", unit:"kg", method:"Drop off", pledgeDate:"15 Apr 2026", dropDate:"17 Apr 2026", status:"Confirmed" },
+];
+
+function DonorPledges({ openPledge }) {
   const [tab, setTab] = useState("active");
-  const active = DONOR_PLEDGES.filter(p => p.status === "Pledged" || p.status === "Delivered");
-  const done = DONOR_PLEDGES.filter(p => p.status === "Confirmed" || p.status === "Missed");
+  const [pledges, setPledges] = useState(MY_PLEDGES_SEED);
+
+  const active = pledges.filter(p => p.status === "Pledged" || p.status === "Delivered" || p.status === "Missed");
+  const done = pledges.filter(p => p.status === "Confirmed");
   const list = tab === "active" ? active : done;
+
+  const markDelivered = (id) => setPledges(pledges.map(p => p.id === id ? {...p, status:"Delivered"} : p));
+
+  const rePledge = (p) => {
+    const home = HOMES.find(h => h.name === p.home) || { id:"unknown", name:p.home, area:p.area, address:"", contact:"", phone:"", avatarTone:"teal" };
+    openPledge && openPledge({ home, itemName:p.item, unit:p.unit, qty:parseInt(p.qty,10) || "" });
+  };
 
   return (
     <div className="fadeIn">
@@ -441,10 +592,10 @@ function DonorPledges() {
         <button className={"tab " + (tab==="completed"?"active":"")} onClick={() => setTab("completed")}>Completed <span className="count">{done.length}</span></button>
       </div>
 
-      <div className="tableCard">
-        <table className="tbl">
+      <div className="tableCard" style={{overflowX:"auto"}}>
+        <table className="tbl" style={{minWidth:980}}>
           <thead><tr>
-            <th>Home</th><th>Item</th><th>Qty</th><th>Pledged</th><th>Drop-off</th><th>Status</th>
+            <th style={{minWidth:220}}>Home</th><th>Item</th><th>Qty</th><th>Method</th><th>Pledged</th><th>Delivery</th><th>Status</th><th style={{textAlign:"right", minWidth:140}}>Action</th>
           </tr></thead>
           <tbody>
             {list.map(p => (
@@ -452,16 +603,32 @@ function DonorPledges() {
                 <td>
                   <div className="row" style={{gap:10}}>
                     <div className="avatar sm teal">{initials(p.home)}</div>
-                    <span className="strong">{p.home}</span>
+                    <div style={{minWidth:0}}>
+                      <div className="strong" style={{whiteSpace:"nowrap"}}>{p.home}</div>
+                      <div className="tinyNote">{p.area}</div>
+                    </div>
                   </div>
                 </td>
                 <td>{p.item}</td>
                 <td><span className="strong">{p.qty}</span></td>
-                <td>{p.pledgeDate}</td>
-                <td>{p.dropDate}</td>
-                <td><StatusBadge status={p.status} /></td>
+                <td><span className="tag">{p.method}</span></td>
+                <td style={{whiteSpace:"nowrap"}}>{p.pledgeDate}</td>
+                <td style={{whiteSpace:"nowrap"}}>{p.dropDate}</td>
+                <td><StatusBadge status={p.status}/></td>
+                <td style={{textAlign:"right"}}>
+                  {p.status === "Pledged" && (
+                    <button className="btn teal sm" onClick={() => markDelivered(p.id)}>
+                      <Icon name="check" size={13}/> Mark Delivered
+                    </button>
+                  )}
+                  {p.status === "Missed" && (
+                    <button className="linkBtn" onClick={() => rePledge(p)}>Re-pledge →</button>
+                  )}
+                  {(p.status === "Delivered" || p.status === "Confirmed") && <span className="tinyNote">—</span>}
+                </td>
               </tr>
             ))}
+            {list.length === 0 && <tr><td colSpan={8}><div className="empty">No pledges in this tab yet.</div></td></tr>}
           </tbody>
         </table>
       </div>
@@ -630,7 +797,7 @@ export default function DonorApp({ onSignOut }) {
   else if (active === "browse") screen = <DonorBrowse openHome={openHome} />;
   else if (active === "homeProfile") screen = <DonorHomeProfile home={selectedHome} back={() => navTo("browse")} openPledge={openPledge}/>;
   else if (active === "pledge") screen = <PledgeForm ctx={pledgeCtx} onClose={closePledge}/>;
-  else if (active === "pledges") screen = <DonorPledges/>;
+  else if (active === "pledges") screen = <DonorPledges openPledge={openPledge}/>;
   else if (active === "impact") screen = <DonorImpact/>;
   else if (active === "profile") screen = <DonorProfile/>;
 
