@@ -460,6 +460,23 @@ function PledgeForm({ ctx, onClose, openPledge }) {
     else onClose();
   };
 
+  if (step === "swiggy-success") {
+    return (
+      <div className="pledgeWrap success fadeIn">
+        <div className="card" style={{padding:"36px 28px", textAlign:"center"}}>
+          <div className="checkBig"><Icon name="checkBig" size={36}/></div>
+          <h1 style={{fontSize:28}}>Added to Swiggy cart!</h1>
+          <p className="muted" style={{marginTop:8, fontSize:14}}>Review your order on Swiggy and complete checkout.</p>
+          <div className="row" style={{justifyContent:"center", gap:10, marginTop:22}}>
+            <button className="btn teal lg" onClick={() => window.open("https://www.swiggy.com/instamart", "_blank", "noopener,noreferrer")}>{"Go to Swiggy"}</button>
+            <button className="btn outline lg" onClick={onClose}>{"Mark as Ordered on NeedFeed"}</button>
+          </div>
+          <p className="tinyNote" style={{marginTop:18}}>Come back here after your Swiggy order is confirmed</p>
+        </div>
+      </div>
+    );
+  }
+
   if (step === "success") {
     const methodLabel = method === "order" ? `Order & Deliver via ${platform}` : "Drop off myself";
     const expected = method === "order" ? `Via ${platform}` : date;
@@ -546,37 +563,73 @@ function PledgeForm({ ctx, onClose, openPledge }) {
           </div>
         </>}
 
-        {/* Step 2A — Order & Deliver */}
+        {/* Step 2A — Order & Deliver (Swiggy) */}
         {step === "order" && <>
           <h1 style={{fontSize:24}}>Order & deliver</h1>
           <p className="muted" style={{marginTop:6, marginBottom:20, fontSize:13.5}}>{itemName} · {qty} {unit} · {home.name}</p>
           <div className="formField">
             <label>Select platform</label>
             <div className="row" style={{gap:10, marginTop:4}}>
-              {["Blinkit","JioMart","BigBasket"].map(p => (
-                <button key={p} type="button" onClick={() => setPlatform(p)} style={{
+              {["Swiggy"].map(p => (
+                <button key={p} type="button" style={{
                   flex:1, padding:"14px 8px", borderRadius:10,
-                  border:"1.5px solid " + (platform === p ? "var(--teal)" : "var(--line)"),
-                  background: platform === p ? "var(--teal-tint)" : "var(--surface)",
+                  border:"1.5px solid var(--teal)",
+                  background:"var(--teal-tint)",
                   fontWeight:600, fontSize:13.5,
-                  color: platform === p ? "var(--teal-dark)" : "var(--ink-2)",
+                  color:"var(--teal-dark)",
                   cursor:"pointer", transition:"all .12s",
                 }}>{p}</button>
               ))}
             </div>
-            <div className="hint">Estimated price: ₹120–150 (approximate)</div>
           </div>
           <div className="formField">
             <label>Delivery address</label>
             <div className="readonly">{address}</div>
           </div>
-          {/* TODO: SWIGGY MCP — implemented in Plan 04 */}
-          <button className="btn teal block lg" style={{marginTop:12}} onClick={() => setStep("success")}>
-            <Icon name="arrow" size={14}/> Open cart & order
+          {showAuthPrompt ? (
+            <div className="card fadeIn" style={{
+              background:"var(--teal-tint)", borderColor:"var(--teal-light)",
+              marginTop:12, padding:"14px 16px",
+            }}>
+              <p style={{fontSize:13, color:"var(--ink-3)", marginBottom:10}}>Connect your Swiggy account to continue</p>
+              <input
+                type="text"
+                className="input"
+                placeholder="Enter Swiggy auth token"
+                value={swiggyToken}
+                onChange={e => setSwiggyToken(e.target.value)}
+                style={{width:"100%", marginBottom:10, boxSizing:"border-box"}}
+              />
+              <button className="btn teal block" onClick={addToSwiggyCart}>Continue</button>
+            </div>
+          ) : (
+            <button className="btn teal block lg" style={{marginTop:12}} onClick={addToSwiggyCart}>
+              <Icon name="arrow" size={14}/> {"Add to Swiggy Cart"}
+            </button>
+          )}
+          <p className="tinyNote" style={{textAlign:"center", marginTop:10}}>You&apos;ll be redirected to Swiggy to complete your order</p>
+        </>}
+
+        {/* Step 2A — Swiggy Loading */}
+        {step === "swiggy-loading" && <>
+          <h1 style={{fontSize:24}}>Order & deliver</h1>
+          <p className="muted" style={{marginTop:6, marginBottom:20, fontSize:13.5}}>{itemName} · {qty} {unit} · {home.name}</p>
+          <button className="btn teal block lg" style={{marginTop:12}} disabled>
+            {"Adding to cart…"}
           </button>
-          <p className="tinyNote" style={{textAlign:"center", marginTop:10}}>After ordering, come back here and confirm your pledge</p>
-          <div className="row" style={{justifyContent:"center", marginTop:14}}>
-            <button className="linkBtn" onClick={() => setStep("method")}>← Back to method selection</button>
+        </>}
+
+        {/* Step 2A — Swiggy Error */}
+        {step === "swiggy-error" && <>
+          <h1 style={{fontSize:24}}>Order & deliver</h1>
+          <p className="muted" style={{marginTop:6, marginBottom:20, fontSize:13.5}}>{itemName} · {qty} {unit} · {home.name}</p>
+          <div className="card fadeIn" style={{
+            background:"var(--coral-light)", borderColor:"var(--coral-light)",
+            color:"var(--coral)", padding:"12px 16px",
+            display:"flex", alignItems:"center", gap:10, fontWeight:600, fontSize:13,
+          }}>
+            <Icon name="x" size={16}/> {swiggyError}
+            <button className="btn ghost sm" style={{marginLeft:"auto"}} onClick={() => { setSwiggyError(""); addToSwiggyCart(); }}>Try again</button>
           </div>
         </>}
 
