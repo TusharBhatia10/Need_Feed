@@ -723,11 +723,62 @@ function DonorImpact() {
           </div>
         </div>
       </div>
+
+      {/* Shareable impact card (D-06, D-07) */}
+      <div className="impactCard" style={{
+        background: "linear-gradient(135deg, var(--teal-dark) 0%, var(--teal) 100%)",
+        borderRadius: "var(--radius-lg)",
+        padding: "32px 28px",
+        color: "#fff",
+        marginTop: 32,
+        overflow: "hidden",
+        position: "relative",
+      }}>
+        {/* Brand row */}
+        <div className="row between" style={{alignItems:"flex-start"}}>
+          <div>
+            <div style={{fontFamily:"var(--serif)", fontSize:13, textTransform:"uppercase", letterSpacing:"0.1em", opacity:0.8}}>NeedFeed</div>
+            <div style={{fontSize:12, opacity:0.6, marginTop:2}}>My giving impact</div>
+          </div>
+          <div style={{
+            width:36, height:36, borderRadius:9,
+            background:"rgba(255,255,255,0.2)",
+            display:"grid", placeItems:"center",
+          }}>
+            <span style={{fontFamily:"var(--serif)", fontSize:18, fontWeight:600}}>N</span>
+          </div>
+        </div>
+
+        {/* Stats grid */}
+        <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:20, marginTop:24}}>
+          {[
+            ["28", "Pledges made"],
+            ["9", "Homes supported"],
+            ["412", "Residents helped"],
+            ["5mo", "Giving streak"],
+          ].map(([val, label]) => (
+            <div key={label}>
+              <div style={{fontFamily:"var(--serif)", fontSize:36, fontWeight:500, lineHeight:1.05, letterSpacing:"-0.02em"}}>{val}</div>
+              <div style={{fontSize:12, opacity:0.7, marginTop:4}}>{label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Screenshot hint */}
+        <div style={{fontSize:11.5, opacity:0.55, textAlign:"center", marginTop:24}}>Press &amp; hold to save</div>
+      </div>
     </div>
   );
 }
 
 function DonorProfile() {
+  const [prefs, setPrefs] = useState({
+    "Email alerts": true,
+    "WhatsApp updates": true,
+    "Monthly impact summary": false,
+  });
+  const toggle = (label) => setPrefs(p => ({ ...p, [label]: !p[label] }));
+
   return (
     <div className="fadeIn">
       <div className="pageHead">
@@ -754,27 +805,28 @@ function DonorProfile() {
         <div className="card">
           <h3>Notifications</h3>
           <div style={{display:"flex", flexDirection:"column", gap:14, marginTop:16}}>
-            {[
-              ["New urgent need within 5km", true],
-              ["Weekly digest of nearby homes", true],
-              ["Pledge reminders 2 days before", true],
-              ["Confirmation when delivery is verified", true],
-              ["Monthly impact report", false],
-            ].map(([label, on]) => (
+            {Object.entries(prefs).map(([label, on]) => (
               <div key={label} className="row between" style={{padding:"4px 0"}}>
                 <div style={{fontSize:13.5}}>{label}</div>
-                <div style={{
-                  width:36, height:20, borderRadius:999,
-                  background: on ? "var(--teal)" : "var(--line)",
-                  position:"relative", transition:"all .15s"
-                }}>
+                <button
+                  onClick={() => toggle(label)}
+                  role="switch"
+                  aria-checked={on}
+                  aria-label={label}
+                  style={{
+                    width:36, height:20, borderRadius:999,
+                    background: on ? "var(--teal)" : "var(--line)",
+                    border:"none", position:"relative", cursor:"pointer",
+                    transition:"all .15s",
+                  }}
+                >
                   <div style={{
                     position:"absolute", top:2, left: on ? 18 : 2,
                     width:16, height:16, borderRadius:"50%", background:"#fff",
                     transition:"all .15s",
                     boxShadow:"0 1px 2px rgba(0,0,0,0.15)"
                   }}/>
-                </div>
+                </button>
               </div>
             ))}
           </div>
