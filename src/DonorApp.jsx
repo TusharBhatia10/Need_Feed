@@ -387,15 +387,70 @@ function PledgeForm({ ctx, onClose, openPledge }) {
   const [qty, setQty] = useState(ctx.qty || "");
   const [unit, setUnit] = useState(ctx.unit || "kg");
   const [method, setMethod] = useState(null);
-  const [platform, setPlatform] = useState("Blinkit");
+  const [platform, setPlatform] = useState("Swiggy");
   const [date, setDate] = useState("2026-05-12");
   const [slot, setSlot] = useState("Morning (9am–12pm)");
   const [note, setNote] = useState("");
+  const [swiggyToken, setSwiggyToken] = useState("");
+  const [swiggyError, setSwiggyError] = useState("");
+  const [showAuthPrompt, setShowAuthPrompt] = useState(false);
 
   const home = ctx.home;
   const itemName = ctx.itemName;
   const address = (home && home.address) || "23, Link Road, Andheri West, Mumbai — 400053";
   const contact = (home && home.contact) ? home.contact + ", " + home.phone : "Meera Joshi, +91 98765 43210";
+
+  async function callSwiggyMCP(toolName, args, token) {
+    const response = await fetch("https://mcp.swiggy.com/im", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token,
+      },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        method: "tools/call",
+        id: Date.now(),
+        params: { name: toolName, arguments: args },
+      }),
+    });
+    if (!response.ok) throw new Error(response.statusText);
+    return response.json();
+  }
+
+  const addToSwiggyCart = async () => {
+    if (!swiggyToken) {
+      setShowAuthPrompt(true);
+      return;
+    }
+    setStep("swiggy-loading");
+    setSwiggyError("");
+    try {
+      const addrResponse = await callSwiggyMCP("get_addresses", {}, swiggyToken);
+      const deliveryAddress = addrResponse.result?.addresses?.[0];
+
+      const searchResponse = await callSwiggyMCP("search_products", {
+        addressId: deliveryAddress?.id,
+        query: itemName,
+      }, swiggyToken);
+      const product = searchResponse.result?.products?.[0];
+      if (!product) throw new Error("This item wasn't found on Swiggy Instamart in your area.");
+
+      await callSwiggyMCP("update_cart", {
+        selectedAddressId: deliveryAddress?.id,
+        items: [{ spinId: product?.spinId, quantity: Number(qty) || 1 }],
+      }, swiggyToken);
+
+      await callSwiggyMCP("checkout", {
+        addressId: deliveryAddress?.id,
+      }, swiggyToken);
+
+      setStep("swiggy-success");
+    } catch (error) {
+      setSwiggyError(error.message || "Could not add to Swiggy cart.");
+      setStep("swiggy-error");
+    }
+  };
 
   const goBack = () => {
     if (step === "details") onClose();
