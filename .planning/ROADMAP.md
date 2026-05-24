@@ -33,7 +33,7 @@ Plans:
 - [ ] 01-03-PLAN.md — Admin App: QR code block, EditNeedForm, DonationHistory wiring, empty states, DESK-02
 
 **Wave 3** *(blocked on Wave 2 completion)*
-- [ ] 01-04-PLAN.md — Swiggy MCP integration: callSwiggyMCP, loading/error/success/Ordered states in PledgeForm
+- [x] 01-04-PLAN.md — Swiggy MCP integration: callSwiggyMCP, loading/error/success/Ordered states in PledgeForm
 
 **Wave 4** *(blocked on Wave 3 completion — human checkpoint)*
 - [ ] 01-05-PLAN.md — Human verification checkpoint: full prototype review and phase sign-off
@@ -49,7 +49,7 @@ Cross-cutting constraints:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Complete Prototype Polish | 2/5 | In Progress | - |
+| 1. Complete Prototype Polish | 4/5 | In Progress | - |
 
 ---
 *Roadmap created: 2026-05-24*

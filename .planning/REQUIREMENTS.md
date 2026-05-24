@@ -22,8 +22,8 @@ Prototype polish milestone — UI quality, missing flows, Swiggy integration, an
 
 ### Swiggy Integration
 
-- [ ] **SWIGGY-01**: In the Pledge Flow Step 2A, donor can add the pledged item directly to a Swiggy cart via the Swiggy MCP API (item name + quantity + home's delivery address pre-filled)
-- [ ] **SWIGGY-02**: After the Swiggy cart is populated, the donor is redirected to Swiggy to complete payment; on return, they can mark the pledge as "Ordered" on NeedFeed
+- [x] **SWIGGY-01**: In the Pledge Flow Step 2A, donor can add the pledged item directly to a Swiggy cart via the Swiggy MCP API (item name + quantity + home's delivery address pre-filled)
+- [x] **SWIGGY-02**: After the Swiggy cart is populated, the donor is redirected to Swiggy to complete payment; on return, they can mark the pledge as "Ordered" on NeedFeed
 
 ### Desktop Responsiveness
 
@@ -95,8 +95,8 @@ Prototype polish milestone — UI quality, missing flows, Swiggy integration, an
 | DESK-02 | Phase 1 | Pending |
 | BUG-01 | Phase 1 | Complete (01-02) |
 | BUG-02 | Phase 1 | Pending |
-| SWIGGY-01 | Phase 1 | Pending |
-| SWIGGY-02 | Phase 1 | Pending |
+| SWIGGY-01 | Phase 1 | Complete (01-04) |
+| SWIGGY-02 | Phase 1 | Complete (01-04) |
 
 **Coverage:**
 - v1 requirements: 13 total

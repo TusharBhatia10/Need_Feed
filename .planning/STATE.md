@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-02-PLAN.md
+stopped_at: Completed 01-04-PLAN.md (Swiggy MCP integration)
 last_updated: "2026-05-24"
-last_activity: 2026-05-24 — Plan 01-02 complete (DonorApp interactive features)
+last_activity: 2026-05-24 — 01-04 complete: callSwiggyMCP wrapper, loading/error/success states, Step 2A Swiggy pill + CTA
 progress:
   total_phases: 1
   completed_phases: 0
   total_plans: 5
-  completed_plans: 2
-  percent: 40
+  completed_plans: 4
+  percent: 80
 ---
 
 # Project State
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-05-24)
 ## Current Position
 
 Phase: 1 of 1 (Complete Prototype Polish)
-Plan: 2 of 5 in current phase (01-01 and 01-02 complete)
+Plan: 4 of 5 in current phase (01-01, 01-02, 01-03, 01-04 complete)
 Status: Executing
-Last activity: 2026-05-24 — 01-02 complete: teal gradient card, wired toggles, rich empty states, BUG-01 audit
+Last activity: 2026-05-24 — 01-04 complete: callSwiggyMCP JSON-RPC wrapper, addToSwiggyCart 4-step MCP sequence, loading/error/success UI states, Step 2A Swiggy pill + auth prompt + CTA
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -63,6 +63,7 @@ Recent decisions affecting current work:
 
 - Init: React + Vite, no router, mock data in data.js, skip auth, Option C deferred to v2, Swiggy MCP replaces deeplink for Order & Deliver path
 - 01-02: Toggle pill as button with role=switch (WCAG AA); go prop threaded to DonorPledges for Browse CTA; Ordered included in active tab filter
+- 01-04: callSwiggyMCP defined inside PledgeForm (matching code organization); swiggy-success as early-return pattern; JSX expression strings for grep-compatible acceptance criteria; showAuthPrompt flag avoids extra step state
 
 ### Pending Todos
 
@@ -84,5 +85,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-05-24
-Stopped at: Completed 01-02-PLAN.md
+Stopped at: Completed 01-04-PLAN.md
 Resume file: None
