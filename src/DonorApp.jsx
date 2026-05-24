@@ -241,7 +241,14 @@ function DonorBrowse({ openHome }) {
       <div className="homeGrid">
         {filtered.map(h => <HomeCard key={h.id} home={h} onClick={() => openHome(h)} />)}
       </div>
-      {filtered.length === 0 && <div className="empty">No homes match that filter.</div>}
+      {filtered.length === 0 && (
+        <div className="empty">
+          <div className="icon">🔍</div>
+          <div className="title">No homes match</div>
+          <div className="sub">Try clearing your filters.</div>
+          <button className="btn outline sm" onClick={() => { setFilter("all"); setQ(""); }}>Clear filters</button>
+        </div>
+      )}
     </div>
   );
 }
@@ -394,6 +401,7 @@ function PledgeForm({ ctx, onClose, openPledge }) {
     if (step === "details") onClose();
     else if (step === "method") setStep("details");
     else if (step === "order" || step === "drop") setStep("method");
+    else if (step === "swiggy-loading" || step === "swiggy-error" || step === "swiggy-success") setStep("order");
     else onClose();
   };
 
@@ -507,6 +515,7 @@ function PledgeForm({ ctx, onClose, openPledge }) {
             <label>Delivery address</label>
             <div className="readonly">{address}</div>
           </div>
+          {/* TODO: SWIGGY MCP — implemented in Plan 04 */}
           <button className="btn teal block lg" style={{marginTop:12}} onClick={() => setStep("success")}>
             <Icon name="arrow" size={14}/> Open cart & order
           </button>
@@ -567,11 +576,11 @@ const MY_PLEDGES_SEED = [
   { id:8, home:"Shanti Niketan Home", area:"Andheri West", item:"Toor Dal", qty:"3 kg", unit:"kg", method:"Order & Deliver", pledgeDate:"24 May 2026", dropDate:"25 May 2026", status:"Ordered" },
 ];
 
-function DonorPledges({ openPledge }) {
+function DonorPledges({ openPledge, go }) {
   const [tab, setTab] = useState("active");
   const [pledges, setPledges] = useState(MY_PLEDGES_SEED);
 
-  const active = pledges.filter(p => p.status === "Pledged" || p.status === "Delivered" || p.status === "Missed");
+  const active = pledges.filter(p => p.status === "Pledged" || p.status === "Ordered" || p.status === "Delivered" || p.status === "Missed");
   const done = pledges.filter(p => p.status === "Confirmed");
   const list = tab === "active" ? active : done;
 
@@ -630,7 +639,16 @@ function DonorPledges({ openPledge }) {
                 </td>
               </tr>
             ))}
-            {list.length === 0 && <tr><td colSpan={8}><div className="empty">No pledges in this tab yet.</div></td></tr>}
+            {list.length === 0 && (
+              <tr><td colSpan={8}>
+                <div className="empty">
+                  <div className="icon">🌱</div>
+                  <div className="title">No pledges yet</div>
+                  <div className="sub">Start by browsing homes near you.</div>
+                  <button className="btn teal sm" onClick={() => go && go("browse")}>Browse homes</button>
+                </div>
+              </td></tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -851,7 +869,7 @@ export default function DonorApp({ onSignOut }) {
   else if (active === "browse") screen = <DonorBrowse openHome={openHome} />;
   else if (active === "homeProfile") screen = <DonorHomeProfile home={selectedHome} back={() => navTo("browse")} openPledge={openPledge}/>;
   else if (active === "pledge") screen = <PledgeForm ctx={pledgeCtx} onClose={closePledge}/>;
-  else if (active === "pledges") screen = <DonorPledges openPledge={openPledge}/>;
+  else if (active === "pledges") screen = <DonorPledges openPledge={openPledge} go={navTo}/>;
   else if (active === "impact") screen = <DonorImpact/>;
   else if (active === "profile") screen = <DonorProfile/>;
 
