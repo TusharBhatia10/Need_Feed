@@ -67,6 +67,7 @@ function StatusBadge({ status }) {
     "Pledged": "pledged", "Delivered": "delivered", "Confirmed": "confirmed",
     "Missed": "missed", "Overdue": "overdue",
     "Urgent": "urgent", "Moderate": "moderate", "Covered": "covered", "Partial": "partial",
+    "Ordered": "ordered",
   };
   return <span className={"badge " + (map[status] || "")}><span className="dot"/>{status}</span>;
 }
@@ -563,6 +564,7 @@ const MY_PLEDGES_SEED = [
   { id:5, home:"Snehalaya Trust", area:"Bandra East", item:"Soap", qty:"10 bars", unit:"pieces", method:"Drop off", pledgeDate:"1 May 2026", dropDate:"3 May 2026", status:"Confirmed" },
   { id:6, home:"Jeevan Dhara", area:"Dadar West", item:"Toothpaste", qty:"5 tubes", unit:"pieces", method:"Order & Deliver", pledgeDate:"20 Apr 2026", dropDate:"21 Apr 2026", status:"Confirmed" },
   { id:7, home:"Shanti Niketan Home", area:"Andheri West", item:"Rice", qty:"4 kg", unit:"kg", method:"Drop off", pledgeDate:"15 Apr 2026", dropDate:"17 Apr 2026", status:"Confirmed" },
+  { id:8, home:"Shanti Niketan Home", area:"Andheri West", item:"Toor Dal", qty:"3 kg", unit:"kg", method:"Order & Deliver", pledgeDate:"24 May 2026", dropDate:"25 May 2026", status:"Ordered" },
 ];
 
 function DonorPledges({ openPledge }) {

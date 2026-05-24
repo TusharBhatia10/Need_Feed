@@ -38,6 +38,8 @@
   --shadow-lg: 0 12px 40px -12px rgba(15, 36, 30, 0.18);
 }
 
+:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+
 * { box-sizing: border-box; }
 html, body, #root { height: 100%; }
 body {
@@ -405,6 +407,7 @@ input:focus, textarea:focus, select:focus {
 .badge.missed, .badge.overdue { background: var(--coral-light); color: var(--coral); }
 .badge.partial { background: var(--amber-light); color: #b56e00; }
 .badge.outline { background: transparent; border: 1px solid var(--line); color: var(--ink-3); }
+.badge.ordered { background: var(--teal-light); color: var(--teal-dark); }
 
 /* Tag chip */
 .tag {
@@ -546,7 +549,7 @@ table.tbl td .strong { color: var(--ink); font-weight: 600; }
 /* Donor cards ----------------------------------------------------- */
 .urgentRow {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(200px, 1fr));
   gap: 14px;
 }
 .urgentCard {
@@ -887,6 +890,9 @@ table.tbl td .strong { color: var(--ink); font-weight: 600; }
   padding: 40px 20px;
   color: var(--ink-3);
 }
+.empty .icon { font-size: 32px; margin-bottom: 8px; opacity: 0.5; }
+.empty .title { font-family: var(--serif); font-size: 18px; color: var(--ink); font-weight: 500; margin-bottom: 8px; }
+.empty .sub { font-size: 13px; color: var(--ink-3); margin-bottom: 16px; line-height: 1.5; }
 
 /* Sub-tab toggle ------------------------------------------------- */
 .segGroup {

@@ -62,7 +62,7 @@ function AdminSidebar({ active, setActive, onSignOut }) {
 }
 
 function ABadge({ status }) {
-  const map = { "Urgent":"urgent", "Partial":"partial", "Covered":"covered", "Pledged":"pledged", "Overdue":"overdue", "Confirmed":"confirmed", "Delivered":"delivered" };
+  const map = { "Urgent":"urgent", "Partial":"partial", "Covered":"covered", "Pledged":"pledged", "Overdue":"overdue", "Confirmed":"confirmed", "Delivered":"delivered", "Ordered":"ordered" };
   return <span className={"badge " + (map[status] || "")}><span className="dot"/>{status}</span>;
 }
 
