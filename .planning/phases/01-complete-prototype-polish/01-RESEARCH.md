@@ -581,19 +581,19 @@ const exportCSV = (data) => {
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Swiggy MCP Auth in Browser**
+1. **Swiggy MCP Auth in Browser** — RESOLVED: Implement the MCP call sequence with graceful error handling per D-02. Display a "Connect Swiggy account" prompt if no token. Full UX shown even if live MCP call is not reachable.
    - What we know: Swiggy MCP requires OAuth 2.1 (phone + OTP). The endpoint returns `{"error":"invalid_token"}` without a token.
    - What's unclear: Whether the NeedFeed prototype will be demoed inside an AI client (like Claude Desktop) that already holds the Swiggy OAuth session, or as a standalone browser tab.
    - Recommendation: Implement the MCP call sequence with graceful error handling per D-02. Display a "Connect Swiggy account" prompt if no token. For demo purposes, the full UX can be shown even if the live MCP call is not reachable.
 
-2. **"Ordered" Status in DonorPledges**
+2. **"Ordered" Status in DonorPledges** — RESOLVED: Add `"Ordered"` as a full status in both `StatusBadge` map and seed data (implemented in Plan 01-01 Task 2 and Plan 01-04).
    - What we know: SWIGGY-02 requires the donor to mark a pledge as "Ordered" after returning from Swiggy.
    - What's unclear: Should "Ordered" be a new status between "Pledged" and "Delivered" in `MY_PLEDGES_SEED` and `StatusBadge`? Or is it only an ephemeral state in `PledgeForm`?
    - Recommendation: Add `"Ordered"` as a full status in both `StatusBadge` map and seed data so the My Pledges tab reflects it correctly.
 
-3. **Admin NeedsBoard Edit UX**
+3. **Admin NeedsBoard Edit UX** — RESOLVED: Use inline `EditNeedForm` toggle pattern consistent with `AddNeedForm` (implemented in Plan 01-03 Task 1).
    - What we know: The Edit button exists but is a no-op.
    - What's unclear: BRD Section 4.2 may specify whether Edit opens a modal or inline form.
    - Recommendation: Use an inline edit pattern (toggle row to editable fields) consistent with `AddNeedForm` — avoids building a new modal component.

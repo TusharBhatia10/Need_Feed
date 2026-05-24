@@ -24,11 +24,24 @@
 **Plans**: 5 plans
 
 Plans:
+
+**Wave 1**
 - [ ] 01-01-PLAN.md — CSS/data foundation: :focus-visible, .empty sub-classes, .badge.ordered, urgentRow minmax, Ordered seed data
+
+**Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 01-02-PLAN.md — Donor App: shareable impact card, wired notification toggles, empty states, BUG-01 audit
 - [ ] 01-03-PLAN.md — Admin App: QR code block, EditNeedForm, DonationHistory wiring, empty states, DESK-02
+
+**Wave 3** *(blocked on Wave 2 completion)*
 - [ ] 01-04-PLAN.md — Swiggy MCP integration: callSwiggyMCP, loading/error/success/Ordered states in PledgeForm
+
+**Wave 4** *(blocked on Wave 3 completion — human checkpoint)*
 - [ ] 01-05-PLAN.md — Human verification checkpoint: full prototype review and phase sign-off
+
+Cross-cutting constraints:
+- All components use `useState` only — no Context, Redux, or external state
+- All styles use CSS custom properties (`var(--*)`) — no hard-coded hex or px values
+- No backend calls — all data remains mock (data.js)
 
 **UI hint**: yes
 
