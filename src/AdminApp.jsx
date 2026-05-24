@@ -176,6 +176,41 @@ function AdminDashboard({ go }) {
   );
 }
 
+function EditNeedForm({ need, onSave, onCancel }) {
+  const [item, setItem] = useState(need.item);
+  const [category, setCategory] = useState(need.category);
+  const [needed, setNeeded] = useState(need.needed);
+  const [unit, setUnit] = useState(need.unit);
+  return (
+    <div className="card fadeIn" style={{borderColor:"var(--teal-light)", background:"var(--teal-tint)"}}>
+      <div className="row between" style={{marginBottom:12}}>
+        <h3>Edit need</h3>
+        <button className="btn ghost sm" onClick={onCancel}><Icon name="x" size={14}/></button>
+      </div>
+      <div className="formGrid">
+        <div className="formField full"><label>Item name</label><input placeholder="e.g. Sugar" value={item} onChange={e => setItem(e.target.value)} /></div>
+        <div className="formField"><label>Category</label>
+          <select value={category} onChange={e => setCategory(e.target.value)}>
+            <option>Grains</option><option>Vegetables</option><option>Toiletries</option><option>Medicine</option><option>Other</option>
+          </select>
+        </div>
+        <div className="formField"><label>Quantity needed</label><input type="number" placeholder="e.g. 30" value={needed} onChange={e => setNeeded(e.target.value)} /></div>
+        <div className="formField"><label>Unit</label>
+          <select value={unit} onChange={e => setUnit(e.target.value)}>
+            <option>kg</option><option>L</option><option>packets</option><option>pieces</option>
+          </select>
+        </div>
+      </div>
+      <div className="row" style={{justifyContent:"flex-end", gap:8, marginTop:6}}>
+        <button className="btn ghost" onClick={onCancel}>Cancel</button>
+        <button className="btn teal" disabled={!item || !needed} onClick={() => onSave({ ...need, item, category, needed: Number(needed), unit })}>
+          <Icon name="check" size={14}/> Save changes
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function AddNeedForm({ onAdd, onCancel }) {
   const [item, setItem] = useState("");
   const [category, setCategory] = useState("Grains");
@@ -215,6 +250,7 @@ function NeedsBoard() {
   const [needs, setNeeds] = useState(INITIAL_NEEDS);
   const [adding, setAdding] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [editingId, setEditingId] = useState(null);
 
   const filtered = useMemo(() => {
     if (filter === "all") return needs;
@@ -239,12 +275,12 @@ function NeedsBoard() {
 
       <div className="toolbar">
         <div className="pillRow">
-          <button className={"pill " + (filter==="all"?"active":"")} onClick={() => setFilter("all")}>All <span className="count">{counts.all}</span></button>
-          <button className={"pill " + (filter==="urgent"?"active":"")} onClick={() => setFilter("urgent")}>Urgent <span className="count">{counts.urgent}</span></button>
-          <button className={"pill " + (filter==="partial"?"active":"")} onClick={() => setFilter("partial")}>Partial <span className="count">{counts.partial}</span></button>
-          <button className={"pill " + (filter==="covered"?"active":"")} onClick={() => setFilter("covered")}>Covered <span className="count">{counts.covered}</span></button>
+          <button className={"pill " + (filter==="all"?"active":"")} onClick={() => { setFilter("all"); setEditingId(null); }}>All <span className="count">{counts.all}</span></button>
+          <button className={"pill " + (filter==="urgent"?"active":"")} onClick={() => { setFilter("urgent"); setEditingId(null); }}>Urgent <span className="count">{counts.urgent}</span></button>
+          <button className={"pill " + (filter==="partial"?"active":"")} onClick={() => { setFilter("partial"); setEditingId(null); }}>Partial <span className="count">{counts.partial}</span></button>
+          <button className={"pill " + (filter==="covered"?"active":"")} onClick={() => { setFilter("covered"); setEditingId(null); }}>Covered <span className="count">{counts.covered}</span></button>
         </div>
-        <button className="btn teal" onClick={() => setAdding(true)} style={{marginLeft:"auto"}}><Icon name="plus" size={14}/> Add new need</button>
+        <button className="btn teal" onClick={() => { setAdding(true); if (editingId) setEditingId(null); }} style={{marginLeft:"auto"}}><Icon name="plus" size={14}/> Add new need</button>
       </div>
 
       {adding && (
@@ -259,10 +295,31 @@ function NeedsBoard() {
             <th>Item</th><th>Category</th><th style={{width:120}}>Needed</th><th style={{width:200}}>Pledged</th><th style={{width:120}}>Status</th><th style={{width:90, textAlign:"right"}}>Actions</th>
           </tr></thead>
           <tbody>
+            {filtered.length === 0 && (
+              <tr><td colSpan={6}><div className="empty">
+                <div className="icon">📋</div>
+                <div className="title">No needs listed</div>
+                <div className="sub">Add items your home needs from donors.</div>
+                <button className="btn teal sm" onClick={() => setAdding(true)}>Add first need</button>
+              </div></td></tr>
+            )}
             {filtered.map(n => {
               const status = statusOf(n);
               const pct = Math.min(100, Math.round((n.pledged/n.needed)*100));
               const cls = status === "Urgent" ? "coral" : status === "Partial" ? "amber" : "green";
+              if (editingId === n.id) {
+                return (
+                  <tr key={n.id}>
+                    <td colSpan={6}>
+                      <EditNeedForm
+                        need={n}
+                        onSave={(updated) => { setNeeds(needs.map(x => x.id === n.id ? updated : x)); setEditingId(null); }}
+                        onCancel={() => setEditingId(null)}
+                      ></EditNeedForm>
+                    </td>
+                  </tr>
+                );
+              }
               return (
                 <tr className="row" key={n.id}>
                   <td><span className="strong">{n.item}</span></td>
@@ -277,7 +334,7 @@ function NeedsBoard() {
                   <td><ABadge status={status}/></td>
                   <td style={{textAlign:"right"}}>
                     <div className="row" style={{gap:4, justifyContent:"flex-end"}}>
-                      <button className="btn ghost sm" title="Edit"><Icon name="edit" size={14}/></button>
+                      <button className="btn ghost sm" title="Edit" onClick={() => setEditingId(n.id)}><Icon name="edit" size={14}/></button>
                       <button className="btn ghost sm" title="Remove" onClick={() => setNeeds(needs.filter(x => x.id !== n.id))}><Icon name="trash" size={14}/></button>
                     </div>
                   </td>
@@ -423,6 +480,7 @@ function DonationHistory() {
 
 function HomeProfileEdit() {
   const [saved, setSaved] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [form, setForm] = useState({
     name: "Shanti Niketan Home",
     address: "Plot 14, Veera Desai Road, Andheri West",
@@ -433,6 +491,25 @@ function HomeProfileEdit() {
     hours: "Mon–Sat, 9:30 AM – 5:30 PM",
   });
   const update = (k, v) => { setForm({ ...form, [k]: v }); setSaved(false); };
+
+  const slug = form.name.toLowerCase().replace(/\s+/g, "-");
+  const shareUrl = "https://needfeed.in/h/" + slug;
+  const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?data=" + encodeURIComponent(shareUrl) + "&size=160x160";
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+    } catch {
+      const el = document.createElement("textarea");
+      el.value = shareUrl;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <div className="fadeIn">
@@ -480,8 +557,19 @@ function HomeProfileEdit() {
             <h3 style={{display:"flex", alignItems:"center", gap:8}}><Icon name="arrow" size={16}/> Your NeedFeed link</h3>
             <p className="muted" style={{fontSize:12.5, marginTop:6}}>Share this with potential donors — anyone with the link can see your needs and pledge directly.</p>
             <div className="url">
-              <span>needfeed.in/h/shanti-niketan</span>
-              <button className="btn ghost sm"><Icon name="copy" size={13}/> Copy</button>
+              <span>needfeed.in/h/{slug}</span>
+              <button className="btn ghost sm" onClick={copyLink}><Icon name="copy" size={13}/> {copied ? "Copied!" : "Copy"}</button>
+            </div>
+          </div>
+          <div className="card" style={{marginTop:16}}>
+            <h3>QR code</h3>
+            <p className="muted" style={{fontSize:12.5, marginTop:6}}>Print or display this to let donors scan and pledge directly.</p>
+            <div style={{display:"flex", gap:18, alignItems:"flex-start", marginTop:14}}>
+              <img src={qrUrl} alt="Home QR code" width={160} height={160} style={{borderRadius:8, border:"1px solid var(--line)"}} />
+              <div>
+                <div className="tinyNote" style={{wordBreak:"break-all", marginBottom:10}}>{shareUrl}</div>
+                <button className="btn outline sm" onClick={copyLink}><Icon name="copy" size={13}/> {copied ? "Copied!" : "Copy link"}</button>
+              </div>
             </div>
           </div>
           <div className="card">
