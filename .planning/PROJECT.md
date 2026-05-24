@@ -41,6 +41,7 @@ This milestone: polish the prototype to personal-milestone quality before tackli
 - [ ] Missing screens/flows — audit every BRD section against the codebase and build any gaps
 - [ ] Mobile responsiveness — all screens work cleanly at 375px, 768px, and 1024px
 - [ ] Interaction bugs — all buttons, modals, tabs, and state transitions work correctly end-to-end with mock data
+- [ ] Swiggy cart integration — when a donor pledges an item, the pledge flow can add it directly to a Swiggy cart via the Swiggy MCP API (replaces/supplements the deeplink approach in Option A)
 
 ### Out of Scope
 
