@@ -298,7 +298,7 @@ function NeedsBoard() {
             {filtered.length === 0 && (
               <tr><td colSpan={6}><div className="empty">
                 <div className="icon">📋</div>
-                <div className="title">No needs listed</div>
+                <div className="title">{"No needs listed"}</div>
                 <div className="sub">Add items your home needs from donors.</div>
                 <button className="btn teal sm" onClick={() => setAdding(true)}>Add first need</button>
               </div></td></tr>
@@ -348,7 +348,7 @@ function NeedsBoard() {
   );
 }
 
-function IncomingPledges() {
+function IncomingPledges({ go }) {
   const [tab, setTab] = useState("upcoming");
   const [pledges, setPledges] = useState(INCOMING_PLEDGES);
 
@@ -405,7 +405,12 @@ function IncomingPledges() {
               </tr>
             ))}
             {filtered.length === 0 && (
-              <tr><td colSpan={7}><div className="empty">Nothing in this tab.</div></td></tr>
+              <tr><td colSpan={7}><div className="empty">
+                <div className="icon">🤝</div>
+                <div className="title">{"No pledges yet"}</div>
+                <div className="sub">Share your home&apos;s QR code to attract donors.</div>
+                <button className="btn outline sm" onClick={() => go && go("profile")}>View QR code</button>
+              </div></td></tr>
             )}
           </tbody>
         </table>
@@ -415,6 +420,30 @@ function IncomingPledges() {
 }
 
 function DonationHistory() {
+  const [q, setQ] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+
+  const filtered = useMemo(() => {
+    let list = HISTORY;
+    if (q.trim()) {
+      const s = q.toLowerCase();
+      list = list.filter(h => h.donor.toLowerCase().includes(s) || h.item.toLowerCase().includes(s));
+    }
+    if (dateFrom) list = list.filter(h => h.date >= dateFrom);
+    return list;
+  }, [q, dateFrom]);
+
+  const exportCSV = () => {
+    const headers = ["Donor","Item","Qty","Date","Confirmed by"];
+    const rows = filtered.map(r => [r.donor, r.item, r.qty, r.date, r.confirmedBy]);
+    const csv = [headers, ...rows].map(row => row.join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "donation-history.csv"; a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const months = [
     { m:"Dec", v: 12 }, { m:"Jan", v: 16 }, { m:"Feb", v: 14 },
     { m:"Mar", v: 22 }, { m:"Apr", v: 20 }, { m:"May", v: 8, partial: true },
@@ -428,7 +457,7 @@ function DonationHistory() {
           <h1>Donation history</h1>
           <div className="sub">Every confirmed delivery, on the record.</div>
         </div>
-        <button className="btn outline sm">Export CSV</button>
+        <button className="btn outline sm" onClick={exportCSV}>Export CSV</button>
       </div>
 
       <div className="statsRow">
@@ -438,11 +467,25 @@ function DonationHistory() {
       </div>
 
       <div className="twoCol section">
-        <div className="tableCard" style={{gridColumn:"1 / 2"}}>
+        <div className="tableCard" style={{gridColumn:"1 / 2", overflowX:"auto"}}>
+          <div style={{display:"flex", gap:8, alignItems:"center", padding:"10px 14px 0"}}>
+            <div className="searchWrap" style={{flex:1}}>
+              <span className="ico"><Icon name="search" size={16}/></span>
+              <input placeholder="Search donor or item…" value={q} onChange={e => setQ(e.target.value)} />
+            </div>
+            <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} style={{padding:"7px 10px", border:"1px solid var(--line)", borderRadius:8, fontSize:13, color:"var(--ink)", background:"var(--surface)"}} />
+          </div>
           <table className="tbl">
             <thead><tr><th>Donor</th><th>Item</th><th>Qty</th><th>Date</th><th>Confirmed by</th></tr></thead>
             <tbody>
-              {HISTORY.map((h, i) => (
+              {filtered.length === 0 && (
+                <tr><td colSpan={5}><div className="empty">
+                  <div className="icon">📊</div>
+                  <div className="title">{"No history yet"}</div>
+                  <div className="sub">Confirmed donations will appear here.</div>
+                </div></td></tr>
+              )}
+              {filtered.map((h, i) => (
                 <tr className="row" key={i}>
                   <td><div className="row" style={{gap:10}}><div className="avatar sm teal">{initials(h.donor)}</div><span className="strong">{h.donor}</span></div></td>
                   <td>{h.item}</td>
@@ -597,7 +640,7 @@ export default function AdminApp({ onSignOut }) {
   let screen = null;
   if (active === "dashboard") screen = <AdminDashboard go={setActive}/>;
   else if (active === "needs") screen = <NeedsBoard/>;
-  else if (active === "incoming") screen = <IncomingPledges/>;
+  else if (active === "incoming") screen = <IncomingPledges go={setActive}/>;
   else if (active === "history") screen = <DonationHistory/>;
   else if (active === "profile") screen = <HomeProfileEdit/>;
   return (
