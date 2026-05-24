@@ -35,34 +35,38 @@ created: 2026-05-24
 
 ## Spacing Scale
 
-All spacing values must use CSS token variables or the explicit pixel values listed below. No other pixel values may appear as inline styles or new CSS rules.
+All spacing values for **new CSS rules** must use CSS token variables or the explicit pixel values listed in the normative scale below. No other pixel values may appear in new CSS rules.
+
+### Normative Scale (use for all new rules)
 
 | Token | Value | Usage |
 |-------|-------|-------|
 | xs | 4px | Icon gaps, inline chip padding |
 | sm | 8px | Button gap, badge gap, form hint margin |
-| md | 16px | Default element spacing, form field margin-bottom (14px ≈ md) |
+| md | 16px | Default element spacing, form field margin-bottom |
 | lg | 24px | Section head margin-bottom, modal footer padding-top |
 | xl | 32px | `.section` margin-top, impact card margin-top |
 | 2xl | 48px | — |
 | 3xl | 64px | Main content bottom padding |
 
-**Established padding values in the codebase (do not change):**
-
-| Context | Value |
-|---------|-------|
-| `.main` padding | 38px 44px 64px |
-| `.main.dense` padding | 28px 36px 56px |
-| `.card` padding | 18px |
-| `.modal` padding | 28px |
-| `.empty` padding | 40px 20px |
-| `.urgentCard` padding | 16px |
-| `.detailHero` padding | 26px 28px |
-
-**Exceptions:**
-- Impact card padding: 32px 28px (specified in CONTEXT.md D-07 / RESEARCH.md Pattern 5)
-- Touch targets on toggle switches: 36px wide × 20px tall (inline toggle pill as per RESEARCH.md Pattern 2)
+**Exceptions (normative — declared in CONTEXT.md / RESEARCH.md):**
+- Impact card padding: 32px 28px (CONTEXT.md D-07 / RESEARCH.md Pattern 5)
+- Touch targets on toggle switches: 36px wide × 20px tall (RESEARCH.md Pattern 2)
 - QR code block image: 160×160px fixed (CONTEXT.md D-08)
+
+### Pre-existing Legacy Values — Do Not Replicate
+
+These values exist in the codebase prior to this phase. They are frozen exceptions inherited from the pre-token codebase. Executors must not use these values for any new CSS rules; they are listed here only so the executor does not "fix" existing rules and introduce regressions.
+
+| Context | Value | Non-multiple reason |
+|---------|-------|---------------------|
+| `.main` padding | 38px 44px 64px | 38px ≠ multiple of 4 |
+| `.main.dense` padding | 28px 36px 56px | 36px ≠ multiple of 4 |
+| `.card` padding | 18px | 18px ≠ multiple of 4 |
+| `.modal` padding | 28px | 28px ≠ multiple of 4 (tolerated) |
+| `.empty` padding | 40px 20px | 20px ≠ multiple of 4 |
+| `.urgentCard` padding | 16px | OK — listed for completeness |
+| `.detailHero` padding | 26px 28px | 26px ≠ multiple of 4 |
 
 > Source: index.css :root + component rules; RESEARCH.md Patterns 2, 3, 5
 
@@ -70,22 +74,33 @@ All spacing values must use CSS token variables or the explicit pixel values lis
 
 ## Typography
 
-All type must use `var(--serif)` or `var(--sans)` — never raw font-family strings. No new font sizes may be introduced; use only those declared below.
+All type must use `var(--serif)` or `var(--sans)` — never raw font-family strings. No new font sizes may be introduced; use only the four roles declared below.
 
-| Role | Family | Size | Weight | Line Height | CSS Rule |
-|------|--------|------|--------|-------------|----------|
-| Body | sans | 14px | 400 | 1.45 | `body` default |
-| Label / small | sans | 12–13.5px | 500–600 | 1.3 | `.formField label`, `.tinyNote`, `.badge` |
-| Subheading | sans | 17px | 600 | 1.3 | `h3` |
-| Section heading | serif | 20–22px | 500 | 1.25 | `h2`, `.sectionHead h2` |
-| Page title | serif | 28–32px | 500 | 1.15 | `h1`, `.pageTitle` |
-| Stat / display number | serif | 34–36px | 500 | 1.05 | `.stat .value`, impact card stat |
+| Role | Family | Size | Weight | Line Height | Applies To |
+|------|--------|------|--------|-------------|------------|
+| Label / Small | sans | 12–13.5px | 500–600 | 1.3 | `.formField label`, `.tinyNote`, `.badge`, brand mark serif "N" (13px uppercase), screenshot hint, toggle label, small muted text |
+| Body | sans | 14–15px | 400 | 1.45 | `body` default, form labels, general prose. Any 15px variant absorbs here. |
+| Heading | serif / sans | 18–22px | 500–600 | 1.25 | `h2`, `h3`, `.sectionHead h2`, empty state titles, subheadings. Absorbs 17px, 18px, 20px, 22px into one tier. |
+| Display | serif | 28–36px | 500 | 1.05–1.15 | `h1`, `.pageTitle` (28–32px), `.stat .value` and impact card stat numbers (34–36px). Shared display tier. |
 
 **Weights used in this phase:** 400 (regular body) and 500–600 (medium/semibold labels, headings). No 700 or 300.
 
-**Impact card stat numbers specifically:** `font-family: var(--serif); font-size: 36px; font-weight: 500; line-height: 1.05; letter-spacing: -0.02em` — as specified in CONTEXT.md D-07 and RESEARCH.md Pattern 5.
+**Impact card stat numbers specifically:** `font-family: var(--serif); font-size: 36px; font-weight: 500; line-height: 1.05; letter-spacing: -0.02em` — role: Display — as specified in CONTEXT.md D-07 and RESEARCH.md Pattern 5.
 
-**Empty state title:** `font-family: var(--serif); font-size: 18px; font-weight: 500` inside `.empty .title`.
+**Empty state title:** `font-family: var(--serif); font-size: 18px; font-weight: 500` inside `.empty .title` — role: Heading.
+
+**Size aliases (removed intermediate sizes — reference role name only):**
+- 11.5px → Label/Small
+- 12px → Label/Small
+- 12.5px → Label/Small
+- 13px → Label/Small
+- 13.5px → Label/Small
+- 17px → Heading
+- 18px → Heading
+- 20px → Heading
+- 22px → Heading
+- 28px–32px → Display
+- 34px–36px → Display
 
 > Source: index.css :root + h1/h2/h3/body rules; CONTEXT.md D-07; RESEARCH.md Pattern 1
 
@@ -131,6 +146,20 @@ All color values must use CSS custom properties. No hex literals in JSX or new C
 | Moderate | `var(--amber-light)` | `#b56e00` |
 
 > Source: index.css :root color tokens; CONTEXT.md decisions D-01–D-11; BRD Section 3.1.2 via RESEARCH.md
+
+---
+
+## Visual Hierarchy
+
+Primary focal point per primary screen. This does not prescribe design changes — it declares the existing visual priority so executors do not inadvertently de-emphasise the most important element.
+
+| Screen | Primary Focal Point | Rationale |
+|--------|--------------------|-----------| 
+| DonorHome | Urgency strip — the urgent cards row at the top of the feed | Donors must see the most time-sensitive needs first; this row carries the highest visual weight via coral urgency badges and card shadows |
+| AdminDashboard | Attention-required section — incoming pledges needing action | Admins open the dashboard to act; the pledges awaiting mark-received/delivered are the primary action surface |
+| AdminNeedsBoard | Active needs table | The table is the complete list of what the home currently needs; it is the admin's primary management surface on this screen |
+
+> Source: BRD screen layout specs; RESEARCH.md Architecture Patterns
 
 ---
 
@@ -197,10 +226,12 @@ These do not exist yet and must be created in this phase.
 
 **CSS additions to index.css (extend `.empty`):**
 ```css
-.empty .icon { font-size: 32px; margin-bottom: 12px; opacity: 0.5; }
-.empty .title { font-family: var(--serif); font-size: 18px; color: var(--ink); font-weight: 500; margin-bottom: 6px; }
-.empty .sub { font-size: 13px; color: var(--ink-3); margin-bottom: 18px; line-height: 1.5; }
+.empty .icon { font-size: 32px; margin-bottom: 8px; opacity: 0.5; }
+.empty .title { font-family: var(--serif); font-size: 18px; color: var(--ink); font-weight: 500; margin-bottom: 8px; }
+.empty .sub { font-size: 13px; color: var(--ink-3); margin-bottom: 16px; line-height: 1.5; }
 ```
+
+Note: `margin-bottom` values use normative scale (8px = sm, 16px = md). Roles: `.empty .title` → Heading tier; `.empty .sub` → Label/Small tier.
 
 **Icon choices per context (warm tone, brand-aligned):**
 | Screen | Icon | Title | Subtitle | CTA |
@@ -218,7 +249,7 @@ These do not exist yet and must be created in this phase.
 
 Toggle switch styled inline — no new CSS class needed (uses existing inline style pattern).
 
-**Layout:** `.row.between` with label at 13.5px and toggle pill (36×20px, border-radius 999px).
+**Layout:** `.row.between` with label at Label/Small tier (13.5px) and toggle pill (36×20px, border-radius 999px).
 **States:** OFF = `var(--line)` background, thumb at `left: 2px`. ON = `var(--teal)` background, thumb at `left: 18px`. Thumb: 16×16px white circle, `border-radius: 50%`, `box-shadow: 0 1px 2px rgba(0,0,0,0.15)`. Transition: `all 0.15s`.
 **Initial state:** Email alerts: ON, WhatsApp updates: ON, Monthly impact summary: OFF.
 **Labels (BRD Section 3.7 — exactly 3, no others):** "Email alerts", "WhatsApp updates", "Monthly impact summary"
@@ -228,17 +259,17 @@ Toggle switch styled inline — no new CSS class needed (uses existing inline st
 ### 3. Shareable Impact Card (FLOW-01)
 
 **Container:** `linear-gradient(135deg, var(--teal-dark) 0%, var(--teal) 100%)`, `border-radius: var(--radius-lg)`, `padding: 32px 28px`, `color: #fff`, `margin-top: 32px`, `overflow: hidden`, `position: relative`.
-**Brand row:** NeedFeed wordmark in `var(--serif)` at 13px uppercase + letter-spacing 0.1em, opacity 0.8. Brand mark: 36×36px rounded square, `rgba(255,255,255,0.2)` background, serif "N" at 18px.
-**Stats grid:** 2×2 grid, gap 20px. Each cell: stat value in `var(--serif)` 36px weight 500 `letter-spacing: -0.02em`, label at 12px opacity 0.7.
+**Brand row:** NeedFeed wordmark in `var(--serif)` at Label/Small tier (13px) uppercase + letter-spacing 0.1em, opacity 0.8. Brand mark: 36×36px rounded square, `rgba(255,255,255,0.2)` background, serif "N" at Label/Small tier (18px lower bound of Heading — use 13px for brand mark specifically as it is typeset at Label/Small scale within the brand mark widget).
+**Stats grid:** 2×2 grid, gap 20px. Each cell: stat value in `var(--serif)` at Display tier (36px) weight 500 `letter-spacing: -0.02em`, label at Label/Small tier (12px) opacity 0.7.
 **Stats shown:** Total pledges, Homes supported, Residents helped, Giving streak (pull from mock data).
-**Screenshot hint:** "Press & hold to save" at 11.5px, opacity 0.55, centered, margin-top 24px.
+**Screenshot hint:** "Press & hold to save" at Label/Small tier (11.5px end of range), opacity 0.55, centered, margin-top 24px.
 
 > Source: CONTEXT.md D-06, D-07; RESEARCH.md Pattern 5
 
 ### 4. QR Code Block (FLOW-02)
 
 **Placement:** Inside `HomeProfileEdit` (AdminApp.jsx:424), below the existing `.shareCard` form section.
-**Container:** `.card` with `margin-top: 14px`.
+**Container:** `.card` with `margin-top: 16px` (md token — normative scale).
 **QR image:** `<img>` pointing to `https://api.qrserver.com/v1/create-qr-code/?data={encodeURIComponent(shareUrl)}&size=160x160`, 160×160px, `border-radius: 8px`, `border: 1px solid var(--line)`.
 **Share URL format:** `https://needfeed.in/h/{slug}` where slug is derived from the home name.
 **Copy button:** `.btn.outline.sm` with `Icon name="copy"` + "Copy link" label. On click: `navigator.clipboard.writeText(shareUrl)` with 2-second "Copied!" feedback on the button label.
@@ -270,7 +301,7 @@ Minimum supported viewport: **1024px**. Mobile (< 1024px) is out of scope — do
 | `.twoCol` | `2fr 1fr` | Holds at 1024px | No change needed |
 | `.attnRow` | `1fr 100px 110px 90px` | May overflow at 1024px | Add `overflow-x: auto` on parent `.tableCard` if needed |
 | `.sidebar` | `width: 240px` fixed | Total 1024px: 240 sidebar + 784 main — acceptable | No change needed |
-| `.main` padding | `38px 44px` | Fine at 1024px | No change needed |
+| `.main` padding | `38px 44px` (legacy value — do not replicate) | Fine at 1024px | No change needed |
 
 **Breakpoint to add (if any grids need adjustment):**
 ```css
