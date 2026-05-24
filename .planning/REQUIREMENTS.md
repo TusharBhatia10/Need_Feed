@@ -82,29 +82,27 @@ Prototype polish milestone — UI quality, missing flows, Swiggy integration, an
 
 ## Traceability
 
-*(Populated during roadmap creation)*
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| UI-01 | — | Pending |
-| UI-02 | — | Pending |
-| UI-03 | — | Pending |
-| UI-04 | — | Pending |
-| FLOW-01 | — | Pending |
-| FLOW-02 | — | Pending |
-| FLOW-03 | — | Pending |
-| SWIGGY-01 | — | Pending |
-| SWIGGY-02 | — | Pending |
-| DESK-01 | — | Pending |
-| DESK-02 | — | Pending |
-| BUG-01 | — | Pending |
-| BUG-02 | — | Pending |
+| UI-01 | Phase 1 | Pending |
+| UI-02 | Phase 1 | Pending |
+| UI-03 | Phase 1 | Pending |
+| UI-04 | Phase 1 | Pending |
+| FLOW-01 | Phase 1 | Pending |
+| FLOW-02 | Phase 1 | Pending |
+| FLOW-03 | Phase 1 | Pending |
+| DESK-01 | Phase 1 | Pending |
+| DESK-02 | Phase 1 | Pending |
+| BUG-01 | Phase 1 | Pending |
+| BUG-02 | Phase 1 | Pending |
+| SWIGGY-01 | Phase 1 | Pending |
+| SWIGGY-02 | Phase 1 | Pending |
 
 **Coverage:**
 - v1 requirements: 13 total
-- Mapped to phases: 0 (roadmap pending)
-- Unmapped: 13 ⚠️
+- Mapped to phases: 13
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-05-24*
-*Last updated: 2026-05-24 after initial definition*
+*Last updated: 2026-05-24 after roadmap creation*
