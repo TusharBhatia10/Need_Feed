@@ -11,14 +11,14 @@ Prototype polish milestone — UI quality, missing flows, Swiggy integration, an
 
 - [ ] **UI-01**: All screens use a consistent spacing scale, color token system, and typography hierarchy (no one-off values)
 - [ ] **UI-02**: All cards, badges, buttons, and modals match the BRD visual specification exactly (correct labels, states, colors per Section 3.1.2 and Section 4 of BRD)
-- [ ] **UI-03**: Every list or table view that can be empty has a purposeful empty state (zero pledges, zero needs, zero history entries, zero browse results)
+- [x] **UI-03**: Every list or table view that can be empty has a purposeful empty state (zero pledges, zero needs, zero history entries, zero browse results)
 - [ ] **UI-04**: All interactive elements have hover, focus, and active feedback; async-style state changes (e.g., marking a pledge received) show clear visual confirmation
 
 ### Missing Flows
 
-- [ ] **FLOW-01**: Donor can view a shareable impact card on the Impact page — a visually-designed card with their stats that can be screenshotted or shared
+- [x] **FLOW-01**: Donor can view a shareable impact card on the Impact page — a visually-designed card with their stats that can be screenshotted or shared
 - [ ] **FLOW-02**: Admin can view and copy their home's auto-generated QR code on the Home Profile edit page (links to the home's public NeedFeed URL)
-- [ ] **FLOW-03**: Donor notification preference toggles on the Profile page save and restore state correctly within the session
+- [x] **FLOW-03**: Donor notification preference toggles on the Profile page save and restore state correctly within the session
 
 ### Swiggy Integration
 
@@ -32,7 +32,7 @@ Prototype polish milestone — UI quality, missing flows, Swiggy integration, an
 
 ### Bug Audit & Fixes
 
-- [ ] **BUG-01**: Full interaction audit of the Donor App — all navigation, buttons, modals, pledge flow steps, tab toggles, and status transitions work correctly with mock data
+- [x] **BUG-01**: Full interaction audit of the Donor App — all navigation, buttons, modals, pledge flow steps, tab toggles, and status transitions work correctly with mock data
 - [ ] **BUG-02**: Full interaction audit of the Admin Dashboard — all navigation, needs board CRUD, incoming pledge flows, mark-as-received, and history filtering work correctly with mock data
 
 ## v2 Requirements
@@ -86,14 +86,14 @@ Prototype polish milestone — UI quality, missing flows, Swiggy integration, an
 |-------------|-------|--------|
 | UI-01 | Phase 1 | Pending |
 | UI-02 | Phase 1 | Pending |
-| UI-03 | Phase 1 | Pending |
+| UI-03 | Phase 1 | Complete (01-02) |
 | UI-04 | Phase 1 | Pending |
-| FLOW-01 | Phase 1 | Pending |
+| FLOW-01 | Phase 1 | Complete (01-02) |
 | FLOW-02 | Phase 1 | Pending |
-| FLOW-03 | Phase 1 | Pending |
+| FLOW-03 | Phase 1 | Complete (01-02) |
 | DESK-01 | Phase 1 | Pending |
 | DESK-02 | Phase 1 | Pending |
-| BUG-01 | Phase 1 | Pending |
+| BUG-01 | Phase 1 | Complete (01-02) |
 | BUG-02 | Phase 1 | Pending |
 | SWIGGY-01 | Phase 1 | Pending |
 | SWIGGY-02 | Phase 1 | Pending |

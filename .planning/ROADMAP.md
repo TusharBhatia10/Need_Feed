@@ -29,7 +29,7 @@ Plans:
 - [ ] 01-01-PLAN.md — CSS/data foundation: :focus-visible, .empty sub-classes, .badge.ordered, urgentRow minmax, Ordered seed data
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 01-02-PLAN.md — Donor App: shareable impact card, wired notification toggles, empty states, BUG-01 audit
+- [x] 01-02-PLAN.md — Donor App: shareable impact card, wired notification toggles, empty states, BUG-01 audit
 - [ ] 01-03-PLAN.md — Admin App: QR code block, EditNeedForm, DonationHistory wiring, empty states, DESK-02
 
 **Wave 3** *(blocked on Wave 2 completion)*
@@ -49,7 +49,7 @@ Cross-cutting constraints:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Complete Prototype Polish | 0/5 | Not started | - |
+| 1. Complete Prototype Polish | 2/5 | In Progress | - |
 
 ---
 *Roadmap created: 2026-05-24*
