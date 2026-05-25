@@ -427,13 +427,13 @@ function PledgeForm({ ctx, onClose, openPledge }) {
     setSwiggyError("");
     try {
       const addrResponse = await callSwiggyMCP("get_addresses", {}, swiggyToken);
-      const deliveryAddress = addrResponse.result?.addresses?.[0];
+      const deliveryAddress = addrResponse.data?.addresses?.[0];
 
       const searchResponse = await callSwiggyMCP("search_products", {
         addressId: deliveryAddress?.id,
         query: itemName,
       }, swiggyToken);
-      const product = searchResponse.result?.products?.[0];
+      const product = searchResponse.data?.products?.[0];
       if (!product) throw new Error("This item wasn't found on Swiggy Instamart in your area.");
 
       await callSwiggyMCP("update_cart", {
