@@ -387,91 +387,46 @@ function PledgeForm({ ctx, onClose, openPledge }) {
   const [qty, setQty] = useState(ctx.qty || "");
   const [unit, setUnit] = useState(ctx.unit || "kg");
   const [method, setMethod] = useState(null);
-  const [platform, setPlatform] = useState("Swiggy");
   const [date, setDate] = useState("2026-05-12");
   const [slot, setSlot] = useState("Morning (9am–12pm)");
   const [note, setNote] = useState("");
-  const [swiggyToken, setSwiggyToken] = useState("");
-  const [swiggyError, setSwiggyError] = useState("");
-  const [showAuthPrompt, setShowAuthPrompt] = useState(false);
 
   const home = ctx.home;
   const itemName = ctx.itemName;
   const address = (home && home.address) || "23, Link Road, Andheri West, Mumbai — 400053";
   const contact = (home && home.contact) ? home.contact + ", " + home.phone : "Meera Joshi, +91 98765 43210";
 
-  async function callSwiggyMCP(toolName, args, token) {
-    const response = await fetch("https://mcp.swiggy.com/im", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + token,
-      },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        method: "tools/call",
-        id: Date.now(),
-        params: { name: toolName, arguments: args },
-      }),
-    });
-    if (!response.ok) throw new Error(response.statusText);
-    return response.json();
-  }
-
-  const addToSwiggyCart = async () => {
-    if (!swiggyToken) {
-      setShowAuthPrompt(true);
-      return;
-    }
-    setStep("swiggy-loading");
-    setSwiggyError("");
-    try {
-      const addrResponse = await callSwiggyMCP("get_addresses", {}, swiggyToken);
-      const deliveryAddress = addrResponse.data?.addresses?.[0];
-
-      const searchResponse = await callSwiggyMCP("search_products", {
-        addressId: deliveryAddress?.id,
-        query: itemName,
-      }, swiggyToken);
-      const product = searchResponse.data?.products?.[0];
-      if (!product) throw new Error("This item wasn't found on Swiggy Instamart in your area.");
-
-      await callSwiggyMCP("update_cart", {
-        selectedAddressId: deliveryAddress?.id,
-        items: [{ spinId: product?.spinId, quantity: Number(qty) || 1 }],
-      }, swiggyToken);
-
-      await callSwiggyMCP("checkout", {
-        addressId: deliveryAddress?.id,
-      }, swiggyToken);
-
-      setStep("swiggy-success");
-    } catch (error) {
-      setSwiggyError(error.message || "Could not add to Swiggy cart.");
-      setStep("swiggy-error");
-    }
+  const openSwiggy = () => {
+    const query = encodeURIComponent(itemName || "");
+    window.open("https://www.swiggy.com/instamart/search?query=" + query, "_blank", "noopener,noreferrer");
+    setStep("swiggy-success");
   };
 
   const goBack = () => {
     if (step === "details") onClose();
     else if (step === "method") setStep("details");
     else if (step === "order" || step === "drop") setStep("method");
-    else if (step === "swiggy-loading" || step === "swiggy-error" || step === "swiggy-success") setStep("order");
+    else if (step === "swiggy-success") setStep("order");
     else onClose();
   };
 
   if (step === "swiggy-success") {
+    const query = encodeURIComponent(itemName || "");
     return (
       <div className="pledgeWrap success fadeIn">
         <div className="card" style={{padding:"36px 28px", textAlign:"center"}}>
-          <div className="checkBig"><Icon name="checkBig" size={36}/></div>
-          <h1 style={{fontSize:28}}>Added to Swiggy cart!</h1>
-          <p className="muted" style={{marginTop:8, fontSize:14}}>Review your order on Swiggy and complete checkout.</p>
-          <div className="row" style={{justifyContent:"center", gap:10, marginTop:22}}>
-            <button className="btn teal lg" onClick={() => window.open("https://www.swiggy.com/instamart", "_blank", "noopener,noreferrer")}>{"Go to Swiggy"}</button>
-            <button className="btn outline lg" onClick={onClose}>{"Mark as Ordered on NeedFeed"}</button>
+          <div style={{fontSize:40, marginBottom:12}}>🛒</div>
+          <h1 style={{fontSize:26}}>Swiggy Instamart opened!</h1>
+          <p className="muted" style={{marginTop:8, fontSize:14, maxWidth:320, margin:"8px auto 0"}}>
+            <strong>{itemName}</strong> is pre-searched for you. Add it to your cart and complete checkout on Swiggy.
+          </p>
+          <div className="row" style={{justifyContent:"center", gap:10, marginTop:24}}>
+            <button className="btn teal lg" onClick={() => window.open("https://www.swiggy.com/instamart/search?query=" + query, "_blank", "noopener,noreferrer")}>
+              Open Swiggy again
+            </button>
+            <button className="btn outline lg" onClick={onClose}>Mark as Ordered on NeedFeed</button>
           </div>
-          <p className="tinyNote" style={{marginTop:18}}>Come back here after your Swiggy order is confirmed</p>
+          <p className="tinyNote" style={{marginTop:18}}>Come back and click "Mark as Ordered" once your Swiggy order is placed</p>
         </div>
       </div>
     );
@@ -547,7 +502,7 @@ function PledgeForm({ ctx, onClose, openPledge }) {
           <p className="muted" style={{marginTop:6, marginBottom:20, fontSize:13.5}}>{itemName} · {qty} {unit} · {home.name}</p>
           <div className="col" style={{gap:10}}>
             <MethodCard icon="browse" title="Order & Deliver"
-              desc="We'll create a pre-filled cart on Blinkit or JioMart. You pay on their platform and it gets delivered directly to the home."
+              desc="We'll open Swiggy Instamart with the item pre-searched. Add to cart, pay on Swiggy, and it gets delivered directly to the home."
               tag="Fastest" tagTone="pledged" active={method === "order"} onClick={() => setMethod("order")}/>
             <MethodCard icon="pin" title="Drop off myself"
               desc="Get the home's address and deliver the supplies in person. Perfect if you want to visit."
@@ -568,69 +523,33 @@ function PledgeForm({ ctx, onClose, openPledge }) {
           <h1 style={{fontSize:24}}>Order & deliver</h1>
           <p className="muted" style={{marginTop:6, marginBottom:20, fontSize:13.5}}>{itemName} · {qty} {unit} · {home.name}</p>
           <div className="formField">
-            <label>Select platform</label>
+            <label>Platform</label>
             <div className="row" style={{gap:10, marginTop:4}}>
-              {["Swiggy"].map(p => (
-                <button key={p} type="button" style={{
-                  flex:1, padding:"14px 8px", borderRadius:10,
-                  border:"1.5px solid var(--teal)",
-                  background:"var(--teal-tint)",
-                  fontWeight:600, fontSize:13.5,
-                  color:"var(--teal-dark)",
-                  cursor:"pointer", transition:"all .12s",
-                }}>{p}</button>
-              ))}
+              <button type="button" style={{
+                flex:1, padding:"14px 8px", borderRadius:10,
+                border:"1.5px solid var(--teal)",
+                background:"var(--teal-tint)",
+                fontWeight:600, fontSize:13.5,
+                color:"var(--teal-dark)",
+                cursor:"default",
+              }}>Swiggy Instamart</button>
             </div>
           </div>
           <div className="formField">
-            <label>Delivery address</label>
-            <div className="readonly">{address}</div>
+            <label>Item to search</label>
+            <div className="readonly">{itemName} · {qty} {unit}</div>
           </div>
-          {showAuthPrompt ? (
-            <div className="card fadeIn" style={{
-              background:"var(--teal-tint)", borderColor:"var(--teal-light)",
-              marginTop:12, padding:"14px 16px",
-            }}>
-              <p style={{fontSize:13, color:"var(--ink-3)", marginBottom:10}}>Connect your Swiggy account to continue</p>
-              <input
-                type="text"
-                className="input"
-                placeholder="Enter Swiggy auth token"
-                value={swiggyToken}
-                onChange={e => setSwiggyToken(e.target.value)}
-                style={{width:"100%", marginBottom:10, boxSizing:"border-box"}}
-              />
-              <button className="btn teal block" onClick={addToSwiggyCart}>Continue</button>
-            </div>
-          ) : (
-            <button className="btn teal block lg" style={{marginTop:12}} onClick={addToSwiggyCart}>
-              <Icon name="arrow" size={14}/> {"Add to Swiggy Cart"}
-            </button>
-          )}
-          <p className="tinyNote" style={{textAlign:"center", marginTop:10}}>You&apos;ll be redirected to Swiggy to complete your order</p>
-        </>}
-
-        {/* Step 2A — Swiggy Loading */}
-        {step === "swiggy-loading" && <>
-          <h1 style={{fontSize:24}}>Order & deliver</h1>
-          <p className="muted" style={{marginTop:6, marginBottom:20, fontSize:13.5}}>{itemName} · {qty} {unit} · {home.name}</p>
-          <button className="btn teal block lg" style={{marginTop:12}} disabled>
-            {"Adding to cart…"}
-          </button>
-        </>}
-
-        {/* Step 2A — Swiggy Error */}
-        {step === "swiggy-error" && <>
-          <h1 style={{fontSize:24}}>Order & deliver</h1>
-          <p className="muted" style={{marginTop:6, marginBottom:20, fontSize:13.5}}>{itemName} · {qty} {unit} · {home.name}</p>
-          <div className="card fadeIn" style={{
-            background:"var(--coral-light)", borderColor:"var(--coral-light)",
-            color:"var(--coral)", padding:"12px 16px",
-            display:"flex", alignItems:"center", gap:10, fontWeight:600, fontSize:13,
+          <div style={{
+            background:"var(--bg-2)", border:"1px solid var(--line)",
+            borderRadius:"var(--radius)", padding:"12px 14px",
+            fontSize:13, color:"var(--ink-3)", marginTop:4, marginBottom:4, lineHeight:1.5,
           }}>
-            <Icon name="x" size={16}/> {swiggyError}
-            <button className="btn ghost sm" style={{marginLeft:"auto"}} onClick={() => { setSwiggyError(""); addToSwiggyCart(); }}>Try again</button>
+            Clicking the button below will open Swiggy Instamart in a new tab with <strong style={{color:"var(--ink)"}}>{itemName}</strong> pre-searched. Log in to Swiggy, add to cart, and complete checkout there.
           </div>
+          <button className="btn teal block lg" style={{marginTop:12}} onClick={openSwiggy}>
+            <Icon name="arrow" size={14}/> Search on Swiggy Instamart
+          </button>
+          <p className="tinyNote" style={{textAlign:"center", marginTop:10}}>Opens Swiggy in a new tab · Come back here to mark as Ordered</p>
         </>}
 
         {/* Step 2B — Drop off myself */}
