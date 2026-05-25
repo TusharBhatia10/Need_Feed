@@ -508,6 +508,7 @@ table.tbl td {
   color: var(--ink-2);
 }
 table.tbl tr:last-child td { border-bottom: none; }
+table.tbl tr.row { display: table-row; }
 table.tbl tr.row:hover td { background: var(--teal-tint); }
 table.tbl td .strong { color: var(--ink); font-weight: 600; }
 
