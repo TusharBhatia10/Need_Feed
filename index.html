@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swiggy Seva — AI-Powered CSR Commerce Bridge</title>
+  <meta name="description" content="Bridging the gap between donors and shelters using the Swiggy Model Context Protocol (MCP) for Instamart and Food delivery.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Premium Glassmorphic Header -->
+  <header>
+    <div class="logo-container">
+      <div class="logo-icon">S</div>
+      <div class="logo-text">
+        <h1>Swiggy Seva</h1>
+        <span>CSR Commerce Bridge</span>
+      </div>
+    </div>
+    
+    <!-- Tab Controls -->
+    <div class="view-selector">
+      <button class="view-btn active" id="view-btn-donor" onclick="switchView('donor')">
+        <span>💝</span> Donor App
+      </button>
+      <button class="view-btn" id="view-btn-admin" onclick="switchView('admin')">
+        <span>🏡</span> Shelter Admin Portal
+      </button>
+    </div>
+    
+    <div style="font-size: 0.8rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.5rem;">
+      <span style="background: rgba(16, 185, 129, 0.2); color: #10B981; padding: 0.2rem 0.5rem; border-radius: 20px; font-weight: 700;">LIVE</span>
+      <span>Swiggy MCP Sandbox v1.0</span>
+    </div>
+  </header>
+
+
+  <!-- Main Grid Layout -->
+  <main class="main-wrapper">
+    
+    <!-- LEFT PANEL: Dynamic App View Content -->
+    <div style="min-width: 0;">
+      
+      <!-- VIEW 1: Donor Feed App -->
+      <div class="app-view active" id="view-donor">
+        <div style="margin-bottom: 1.5rem;">
+          <h2 style="font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em;">Support verified causes near you</h2>
+          <p style="color: var(--text-secondary); font-size: 0.95rem;">Browse shelters, fund daily-use groceries on Instamart, or request special hot meals on Swiggy Food.</p>
+        </div>
+        
+        <div class="donor-grid" id="shelter-grid">
+          <!-- Populated dynamically via app.js -->
+        </div>
+      </div>
+      
+      <!-- VIEW 2: Shelter Admin Portal Dashboard -->
+      <div class="app-view" id="view-admin">
+        <div class="admin-section">
+          
+          <!-- Admin Sidebar: Selector & Action Forms -->
+          <aside class="admin-sidebar">
+            <h3 class="shelter-selector-title">Select Active Shelter</h3>
+            <div id="admin-shelter-select-list">
+              <!-- Populated dynamically via app.js -->
+            </div>
+            
+            <hr style="border: 0; border-top: 1px solid var(--border); margin: 1.5rem 0;">
+            
+            <!-- ADD NEW NEED FORM -->
+            <form id="admin-add-need-form">
+              <h3 class="shelter-selector-title" style="margin-bottom: 1rem;">Post Supply Requirement</h3>
+              
+              <div class="form-group">
+                <label for="need-category-select">Supply Category</label>
+                <select class="form-control" id="need-category-select" onchange="handleCategoryChange()">
+                  <option value="GROCERY">Grocery Grains (Instamart)</option>
+                  <option value="TOILETRIES">Toiletries & Cleaners (Instamart)</option>
+                  <option value="MEDICINE">First Aid / Medicines (Instamart)</option>
+                  <option value="ANIMAL FOOD">Animal Feed / Fodder (Instamart)</option>
+                  <option value="ENTERTAINMENT">Toys & Entertainment (Instamart)</option>
+                  <option value="SPECIAL_MEAL">Hot Restaurant Special Meal (Food MCP)</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="need-name-select">Select Supply Item</label>
+                <select class="form-control" id="need-name-select" onchange="handleItemChange()"></select>
+              </div>
+              
+              <div class="form-group">
+                <label for="need-qty-input">Total Target Quantity</label>
+                <input type="number" class="form-control" id="need-qty-input" value="10" min="1" required>
+              </div>
+              
+              <div class="form-group" id="form-group-variant">
+                <label for="need-variant-select">Variant / Pack Size</label>
+                <select class="form-control" id="need-variant-select"></select>
+              </div>
+              
+              <button class="btn btn-primary" type="submit">
+                <span>➕</span> Post Need Board
+              </button>
+            </form>
+          </aside>
+          
+          <!-- Admin Dashboard Content -->
+          <div class="admin-main">
+            
+            <!-- Shelter active goal tracker -->
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <h3>Active Needs Tally</h3>
+                <span style="font-size: 0.8rem; color: var(--text-secondary);">Real-time procurement progress</span>
+              </div>
+              <div id="admin-needs-list">
+                <!-- Populated dynamically via app.js -->
+              </div>
+            </div>
+            
+            <!-- Active Swiggy deliveries queue & live tracker -->
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <h3>Active Swiggy Deliveries & Pledges</h3>
+                <span style="background: rgba(255, 82, 0, 0.1); color: var(--secondary); padding: 0.15rem 0.5rem; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">LIVE TRACKING</span>
+              </div>
+              <div class="order-queue" id="admin-orders-queue">
+                <!-- Populated dynamically via app.js -->
+              </div>
+            </div>
+            
+          </div>
+          
+        </div>
+      </div>
+      
+    </div>
+    
+    <!-- RIGHT PANEL: Live Swiggy MCP Server Terminal Console -->
+    <aside style="min-width: 0;">
+      <div class="mcp-console-panel">
+        <div class="console-header">
+          <div class="console-title">
+            <span class="console-dot"></span>
+            <span>Swiggy MCP Terminal Log</span>
+          </div>
+          <button class="console-clear-btn" onclick="clearConsole()">Clear Logs</button>
+        </div>
+        <div class="console-output" id="console-output">
+          <!-- Live JSON RPC lines appear here -->
+        </div>
+      </div>
+    </aside>
+    
+  </main>
+
+  <!-- BACKGROUND SHADE OVERLAY -->
+  <div class="drawer-overlay" id="drawer-overlay" onclick="closeNeedsDrawer()"></div>
+
+  <!-- BROWSE DETAILED NEEDS DRAWER (SLIDES OUT FROM RIGHT) -->
+  <div class="needs-drawer" id="needs-drawer">
+    <div class="drawer-header">
+      <div class="drawer-title">
+        <h2 id="drawer-shelter-name">Aasha Shelter Home</h2>
+        <p id="drawer-shelter-desc">Varanasi, UP</p>
+      </div>
+      <button class="drawer-close" onclick="closeNeedsDrawer()">×</button>
+    </div>
+    <div class="drawer-body" id="drawer-needs-list">
+      <!-- Shelter items populated dynamically -->
+    </div>
+  </div>
+
+  <!-- DYNAMIC SECURE CHECKOUT / SPONSOR MODAL -->
+  <div class="checkout-modal" id="checkout-modal">
+    <div class="checkout-header">
+      <div class="checkout-title">
+        <h3 id="checkout-need-title">Sponsor Atta 10kg</h3>
+        <p style="font-size: 0.8rem; color: var(--text-secondary);">Direct delivery to verified shelter doorstep</p>
+      </div>
+      <button class="drawer-close" onclick="closeCheckoutModal()">×</button>
+    </div>
+    
+    <!-- Screen 1: Payment Checkout Form -->
+    <div id="checkout-form-screen">
+      <div class="form-group">
+        <label for="donor-name-input">Donor Name (Leaves a pledge greeting!)</label>
+        <input type="text" class="form-control" id="donor-name-input" placeholder="e.g. Rohan Sharma">
+      </div>
+      
+      <div class="form-group" style="margin-bottom: 1.5rem;">
+        <label for="checkout-qty">Quantity to Sponsor</label>
+        <input type="number" class="form-control" id="checkout-qty" value="1" min="1" oninput="calculateCheckoutBill()">
+      </div>
+
+      <div class="checkout-item-details">
+        <div class="checkout-summary-row">
+          <span>Item Unit Price:</span>
+          <span id="checkout-need-price">₹460</span>
+        </div>
+        <div class="checkout-summary-row">
+          <span>Subtotal:</span>
+          <strong id="bill-subtotal" style="color: var(--text-primary);">₹460</strong>
+        </div>
+        <div class="checkout-summary-row">
+          <span>Swiggy Delivery Charge:</span>
+          <span id="bill-delivery">₹39</span>
+        </div>
+        <div class="checkout-summary-row">
+          <span>GST & Packaging:</span>
+          <span id="bill-tax">₹23</span>
+        </div>
+        <div class="checkout-summary-row total">
+          <span>Total Donation Pledged:</span>
+          <span id="bill-total">₹522</span>
+        </div>
+      </div>
+
+      <!-- Payment selector simulation -->
+      <div style="font-size: 0.8rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 0.5rem;">Payment Gateway</div>
+      <div class="payment-options">
+        <div class="payment-card active">
+          <h4>UPI / Net Banking</h4>
+          <p>Instant digital transfer</p>
+        </div>
+        <div class="payment-card">
+          <h4>Credit/Debit Card</h4>
+          <p>Visa, MasterCard, Rupay</p>
+        </div>
+      </div>
+
+      <div class="co-brand-note">
+        <span style="font-size: 1.25rem;">🤝</span>
+        <div>
+          Swiggy CSR Initiative matches 10% of this donation! Placing this order will trigger automated procurement via Instamart staging.
+        </div>
+      </div>
+    </div>
+    
+    <!-- Screen 2: Completion success screen -->
+    <div class="success-screen" id="checkout-success-screen">
+      <div class="success-icon">✓</div>
+      <div id="success-msg">
+        <!-- Built dynamically -->
+      </div>
+      <button class="btn btn-secondary" onclick="closeCheckoutModal()" style="margin-top: 1.5rem;">
+        Done & Monitor Track
+      </button>
+    </div>
+
+    <!-- Main Payment CTA -->
+    <button class="btn btn-primary" id="checkout-pay-btn" onclick="handlePaymentSubmit()" style="width: 100%;">
+      Confirm & Process Donation
+    </button>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
