@@ -38,17 +38,32 @@ To facilitate clean interactive demos, page reloads do not persist changes. A re
 
 ---
 
-## 🚀 Running the App Locally
+## 🚀 Installation & Running the App Locally
 
-To start the local staging environment, run any standard web server in the project directory.
+### 1. Installation & Setup
+Clone the repository, enter the directory, and ensure you are on the correct development branch:
 
-### Using Python
+```bash
+# Clone the repository
+git clone https://github.com/TusharBhatia10/Need_Feed.git
+
+# Navigate into the project folder
+cd Need_Feed
+
+# Switch to the active development branch
+git checkout tushar_gemini_v1
+```
+
+### 2. Running Locally
+Need Feed is built purely on vanilla web technologies (HTML, CSS, JS) and does not require complex backend installs or dependencies. To start, run any local HTTP server in the project root:
+
+#### Using Python
 ```bash
 python3 -m http.server 3000
 ```
-Then open [http://localhost:3000](http://localhost:3000) in your web browser.
+Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### Using Node.js (npx)
+#### Using Node.js (npx)
 ```bash
 npx serve .
 ```
