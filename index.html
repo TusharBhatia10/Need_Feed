@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Swiggy Seva — AI-Powered CSR Commerce Bridge</title>
-  <meta name="description" content="Bridging the gap between donors and shelters using the Swiggy Model Context Protocol (MCP) for Instamart and Food delivery.">
+  <title>Need Feed — Connecting Donors to Verified Causes</title>
+  <meta name="description" content="Connecting donors to verified shelters and causes — one supply at a time.">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,10 +12,10 @@
   <!-- Premium Glassmorphic Header -->
   <header>
     <div class="logo-container">
-      <div class="logo-icon">S</div>
+      <div class="logo-icon">N</div>
       <div class="logo-text">
-        <h1>Swiggy Seva</h1>
-        <span>CSR Commerce Bridge</span>
+        <h1>Need Feed</h1>
+        <span>Connecting Donors & Homes</span>
       </div>
     </div>
     
@@ -30,8 +30,8 @@
     </div>
     
     <div style="font-size: 0.8rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.5rem;">
-      <span style="background: rgba(16, 185, 129, 0.2); color: #10B981; padding: 0.2rem 0.5rem; border-radius: 20px; font-weight: 700;">LIVE</span>
-      <span>Swiggy MCP Sandbox v1.0</span>
+      <span style="background: rgba(29, 158, 117, 0.2); color: var(--primary); padding: 0.2rem 0.5rem; border-radius: 20px; font-weight: 700;">ACTIVE</span>
+      <span>Need Feed Platform v2.0</span>
     </div>
   </header>
 
@@ -44,13 +44,57 @@
       
       <!-- VIEW 1: Donor Feed App -->
       <div class="app-view active" id="view-donor">
-        <div style="margin-bottom: 1.5rem;">
-          <h2 style="font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em;">Support verified causes near you</h2>
-          <p style="color: var(--text-secondary); font-size: 0.95rem;">Browse shelters, fund daily-use groceries on Instamart, or request special hot meals on Swiggy Food.</p>
-        </div>
-        
-        <div class="donor-grid" id="shelter-grid">
-          <!-- Populated dynamically via app.js -->
+        <div class="donor-view-layout">
+          <!-- Main Feed Column -->
+          <div class="donor-feed-column">
+            <div style="margin-bottom: 1.5rem;">
+              <h2 style="font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em;">Support verified causes near you</h2>
+              <p style="color: var(--text-secondary); font-size: 0.95rem;">Browse shelters, fund daily-use groceries on Instamart, or request special hot meals on Swiggy Food.</p>
+            </div>
+            
+            <!-- Horizontal button Cause Selector row -->
+            <div class="cause-selector-row" id="cause-filter-row" style="margin-bottom: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              <button class="view-btn active" onclick="setCauseFilter('all')" id="cause-btn-all">All Causes</button>
+              <button class="view-btn" onclick="setCauseFilter('eldercare')" id="cause-btn-eldercare">👵 Eldercare</button>
+              <button class="view-btn" onclick="setCauseFilter('child_welfare')" id="cause-btn-child_welfare">👶 Child Welfare</button>
+              <button class="view-btn" onclick="setCauseFilter('animal_welfare')" id="cause-btn-animal_welfare">🐾 Animal Welfare</button>
+            </div>
+
+            <div class="donor-grid" id="shelter-grid">
+              <!-- Populated dynamically via app.js -->
+            </div>
+          </div>
+          
+          <!-- Left Sidebar Column -->
+          <aside class="donor-sidebar" id="donor-sidebar-panel">
+            <div class="sidebar-header" style="display: flex; justify-content: flex-end; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-bottom: -0.5rem; width: 100%;">
+              <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Collapse Sidebar" style="background: rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.15); color: var(--secondary); font-size: 0.8rem; font-weight: 600; padding: 0.25rem 0.5rem; border-radius: 4px; cursor: pointer; transition: all 0.2s;">◀ Collapse</button>
+            </div>
+            <div class="donor-profile-card">
+              <div class="donor-avatar" style="background-image: url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150')"></div>
+              <div class="donor-profile-info">
+                <h3>Tushar Bhatia</h3>
+                <p>Verified Supporter</p>
+                <div class="donor-stats-row">
+                  <div class="stat-pill">
+                    <span class="stat-num" id="donor-stats-total">₹2,120</span>
+                    <span class="stat-label">Donated</span>
+                  </div>
+                  <div class="stat-pill">
+                    <span class="stat-num" id="donor-stats-count">2</span>
+                    <span class="stat-label">Pledges</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="donation-history-section">
+              <h3>Donation History</h3>
+              <div class="history-list" id="donor-history-list">
+                <!-- Populated dynamically via app.js -->
+              </div>
+            </div>
+          </aside>
         </div>
       </div>
       
@@ -77,7 +121,7 @@
                   <option value="GROCERY">Grocery Grains (Instamart)</option>
                   <option value="TOILETRIES">Toiletries & Cleaners (Instamart)</option>
                   <option value="MEDICINE">First Aid / Medicines (Instamart)</option>
-                  <option value="ANIMAL FOOD">Animal Feed / Fodder (Instamart)</option>
+                  <option value="PERSONAL_CARE">Personal Care & Hygiene (Instamart)</option>
                   <option value="ENTERTAINMENT">Toys & Entertainment (Instamart)</option>
                   <option value="SPECIAL_MEAL">Hot Restaurant Special Meal (Food MCP)</option>
                 </select>
@@ -118,11 +162,11 @@
               </div>
             </div>
             
-            <!-- Active Swiggy deliveries queue & live tracker -->
+            <!-- Active Need Feed deliveries queue & live tracker -->
             <div class="admin-card">
               <div class="admin-card-header">
-                <h3>Active Swiggy Deliveries & Pledges</h3>
-                <span style="background: rgba(255, 82, 0, 0.1); color: var(--secondary); padding: 0.15rem 0.5rem; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">LIVE TRACKING</span>
+                <h3>Active Pledges & Deliveries</h3>
+                <span style="background: rgba(216, 90, 48, 0.1); color: var(--secondary); padding: 0.15rem 0.5rem; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">LIVE TRACKING</span>
               </div>
               <div class="order-queue" id="admin-orders-queue">
                 <!-- Populated dynamically via app.js -->
@@ -136,21 +180,7 @@
       
     </div>
     
-    <!-- RIGHT PANEL: Live Swiggy MCP Server Terminal Console -->
-    <aside style="min-width: 0;">
-      <div class="mcp-console-panel">
-        <div class="console-header">
-          <div class="console-title">
-            <span class="console-dot"></span>
-            <span>Swiggy MCP Terminal Log</span>
-          </div>
-          <button class="console-clear-btn" onclick="clearConsole()">Clear Logs</button>
-        </div>
-        <div class="console-output" id="console-output">
-          <!-- Live JSON RPC lines appear here -->
-        </div>
-      </div>
-    </aside>
+    <!-- RIGHT PANEL: Removed MCP Terminal Console -->
     
   </main>
 
@@ -185,7 +215,7 @@
     <div id="checkout-form-screen">
       <div class="form-group">
         <label for="donor-name-input">Donor Name (Leaves a pledge greeting!)</label>
-        <input type="text" class="form-control" id="donor-name-input" placeholder="e.g. Rohan Sharma">
+        <input type="text" class="form-control" id="donor-name-input" placeholder="e.g. Tushar Bhatia">
       </div>
       
       <div class="form-group" style="margin-bottom: 1.5rem;">
@@ -232,7 +262,7 @@
       <div class="co-brand-note">
         <span style="font-size: 1.25rem;">🤝</span>
         <div>
-          Swiggy CSR Initiative matches 10% of this donation! Placing this order will trigger automated procurement via Instamart staging.
+          Need Feed partner network matches 10% of this donation! Placing this order will log a pledge for direct delivery to the home.
         </div>
       </div>
     </div>
@@ -243,14 +273,39 @@
       <div id="success-msg">
         <!-- Built dynamically -->
       </div>
-      <button class="btn btn-secondary" onclick="closeCheckoutModal()" style="margin-top: 1.5rem;">
-        Done & Monitor Track
-      </button>
+      <div style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem; line-height: 1.4;">
+        You can track your donations now on the Donations History page.
+      </div>
+      <div style="display: flex; gap: 1rem; width: 100%; margin-top: 1.5rem;">
+        <button class="btn btn-secondary" onclick="closeCheckoutModal()" style="flex: 1; padding: 0.65rem;">
+          Close
+        </button>
+        <button class="btn btn-primary" onclick="goToDonationHistory()" style="flex: 1; padding: 0.65rem; white-space: nowrap;">
+          Take me there
+        </button>
+      </div>
     </div>
 
     <!-- Main Payment CTA -->
     <button class="btn btn-primary" id="checkout-pay-btn" onclick="handlePaymentSubmit()" style="width: 100%;">
       Confirm & Process Donation
+    </button>
+  </div>
+
+  <!-- DYNAMIC DONATION DETAILS MODAL -->
+  <div class="checkout-modal" id="donation-details-modal">
+    <div class="checkout-header">
+      <div class="checkout-title">
+        <h3 id="details-modal-title">Donation Details</h3>
+        <p style="font-size: 0.8rem; color: var(--text-secondary);" id="details-modal-subtitle">Direct delivery status</p>
+      </div>
+      <button class="drawer-close" onclick="closeDonationDetailsModal()">×</button>
+    </div>
+    <div class="drawer-body" id="details-modal-body" style="padding: 0;">
+      <!-- Dynamic details content -->
+    </div>
+    <button class="btn btn-secondary" onclick="closeDonationDetailsModal()" style="width: 100%; margin-top: 1.5rem;">
+      Close Details
     </button>
   </div>
 

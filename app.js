@@ -2,77 +2,189 @@
 // Mock Database Layer
 // ==========================================
 
-const SHELTERS_DB = [
+const DEFAULT_SHELTERS_DB = [
   {
-    id: "shelter_aasha",
-    name: "Aasha Senior Citizen Home",
-    type: "Old-Age Home",
-    city: "Varanasi, UP",
-    address: "B-2/45, Assi Ghat Road, Varanasi, UP - 221005",
+    id: "shelter_banyan",
+    name: "The Banyan Tree Geriatric Care",
+    type: "Geriatric Care Home",
+    city: "Mulund West, Mumbai",
+    address: "Chanchal Niwas, Sai Arogya, Next to Mulund High School, Chandan Baug Road, Mulund West, Mumbai - 400080",
+    avatar: "https://images.unsplash.com/photo-1581579438747-1dc8d1e0ca96?auto=format&fit=crop&q=80&w=150",
+    cover: "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=800",
+    description: "Provides 24/7 medical supervision, geriatric nursing, dementia care, physical therapy, and post-surgical recovery for senior citizens.",
+    swiggyAddressId: "addr_aasha_99",
+    cause_type: "eldercare",
+    resident_label: "Residents",
+    residents: 50,
+    website: "https://banyantreegc.com",
+    needs: [
+      { id: "need_banyan_01", name: "Aashirvaad Shudh Chakki Atta 10kg", category: "GROCERY", quantity: 15, pledged: 9, delivered: 4, price: 460, type: "instamart", spinId: "sku_atta_10k" },
+      { id: "need_banyan_02", name: "Fortune Mustard Oil 1L", category: "GROCERY", quantity: 20, pledged: 12, delivered: 8, price: 175, type: "instamart", spinId: "sku_oil_1l" },
+      { id: "need_banyan_03", name: "Tata Sampann Toor Dal 1kg", category: "GROCERY", quantity: 30, pledged: 15, delivered: 5, price: 190, type: "instamart", spinId: "sku_dal_1k" },
+      { id: "need_banyan_04", name: "Gulab Jamun (15 pcs)", category: "SPECIAL MEAL", quantity: 3, pledged: 0, delivered: 0, price: 280, type: "food", isSpecialMeal: true, favoriteFood: "Gulab Jamun Sweet Treat", restaurantId: "rest_bikanervala" }
+    ]
+  },
+  {
+    id: "shelter_manav",
+    name: "C.U. Shah Senior Citizens Home",
+    type: "Senior Citizens Home",
+    city: "Sion West, Mumbai",
+    address: "255/257, Sion Main Road, Opposite Gandhi Market, Sion West, Mumbai - 400022",
     avatar: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&q=80&w=150",
     cover: "https://images.unsplash.com/photo-1544027993-37dbfe43562a?auto=format&fit=crop&q=80&w=800",
-    description: "Caring for 45 elderly residents abandoned or without families. We strive to provide a peaceful, dignified life, daily healthcare, and a loving community.",
-    swiggyAddressId: "addr_aasha_99",
+    description: "Operated by Shree Manav Seva Sangh, providing assisted living, medical/nursing support, and daily nutritious meals.",
+    swiggyAddressId: "addr_kalyan_88",
+    cause_type: "eldercare",
+    resident_label: "Residents",
+    residents: 75,
+    website: "https://shreemanavsevasangh.org",
     needs: [
-      { id: "need_aasha_01", name: "Aashirvaad Shudh Chakki Atta 10kg", category: "GROCERY", quantity: 15, pledged: 9, delivered: 4, price: 460, type: "instamart", spinId: "sku_atta_10k" },
-      { id: "need_aasha_02", name: "Fortune Mustard Oil 1L", category: "GROCERY", quantity: 20, pledged: 12, delivered: 8, price: 175, type: "instamart", spinId: "sku_oil_1l" },
-      { id: "need_aasha_03", name: "Tata Sampann Toor Dal 1kg", category: "GROCERY", quantity: 30, pledged: 15, delivered: 5, price: 190, type: "instamart", spinId: "sku_dal_1k" },
-      { id: "need_aasha_04", name: "Gulab Jamun (15 pcs)", category: "SPECIAL MEAL", quantity: 3, pledged: 0, delivered: 0, price: 280, type: "food", isSpecialMeal: true, favoriteFood: "Gulab Jamun Sweet Treat", restaurantId: "rest_bikanervala" }
+      { id: "need_manav_01", name: "Amul Taaza Fresh Milk 1L Pack", category: "GROCERY", quantity: 40, pledged: 30, delivered: 20, price: 74, type: "instamart", spinId: "sku_milk_1l" },
+      { id: "need_manav_02", name: "Dettol Liquid Handwash 1.5L Refill", category: "TOILETRIES", quantity: 10, pledged: 3, delivered: 1, price: 219, type: "instamart", spinId: "sku_dettol_1.5" },
+      { id: "need_manav_03", name: "Paneer Butter Masala & Garlic Naan Combo", category: "SPECIAL MEAL", quantity: 15, pledged: 0, delivered: 0, price: 340, type: "food", isSpecialMeal: true, favoriteFood: "Festive Butter Paneer Feast", restaurantId: "rest_haldiram" },
+      { id: "need_manav_04", name: "Wooden Ludo & Snakes Board Game", category: "ENTERTAINMENT", quantity: 5, pledged: 2, delivered: 1, price: 299, type: "instamart", spinId: "sku_ludo_board" }
     ]
   },
   {
-    id: "shelter_kalyan",
-    name: "Kalyan Children's Orphanage",
-    type: "Orphanage",
-    city: "Bengaluru, KA",
-    address: "42, 3rd Cross, Koramangala 4th Block, Bengaluru, KA - 560034",
+    id: "shelter_adharwad",
+    name: "Adharwad Old Age Home",
+    type: "Charitable Care Home",
+    city: "Seawoods, Navi Mumbai",
+    address: "Bungalow No. 04, Sea-coast 1, Sector 32, Seawoods, Navi Mumbai - 400706",
+    avatar: "https://images.unsplash.com/photo-1531844251246-9a1bfaae0d76?auto=format&fit=crop&q=80&w=150",
+    cover: "https://images.unsplash.com/photo-1489659639091-8b687bc4386e?auto=format&fit=crop&q=80&w=800",
+    description: "Dedicated to caring for homeless, disabled, or paralyzed seniors, offering 24/7 caregiving and specialized medical attention.",
+    swiggyAddressId: "addr_paws_77",
+    cause_type: "eldercare",
+    resident_label: "Residents",
+    residents: 60,
+    website: "http://www.adharwad.com",
+    needs: [
+      { id: "need_adharwad_01", name: "Tata Sampann Toor Dal 1kg", category: "GROCERY", quantity: 25, pledged: 15, delivered: 10, price: 190, type: "instamart", spinId: "sku_dal_1k" },
+      { id: "need_adharwad_02", name: "Dettol Liquid Handwash 1.5L Refill", category: "TOILETRIES", quantity: 15, pledged: 8, delivered: 4, price: 219, type: "instamart", spinId: "sku_dettol_1.5" },
+      { id: "need_adharwad_03", name: "Savlons Antiseptic Liquid Soap 500ml", category: "MEDICINE", quantity: 12, pledged: 5, delivered: 2, price: 145, type: "instamart", spinId: "sku_savlon_500" }
+    ]
+  },
+  {
+    id: "shelter_dhanwantari",
+    name: "Dhanwantari Old Age Home",
+    type: "Nursing & Care Home",
+    city: "Thane West, Mumbai",
+    address: "Patil Building, Shanti Nagar, Road No. 27, Wagle Estate, Thane West, MH - 400604",
+    avatar: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&q=80&w=150",
+    cover: "https://images.unsplash.com/photo-1576765608622-467489028783?auto=format&fit=crop&q=80&w=800",
+    description: "Specializes in long-term elder care and nursing assistance for bedridden senior citizens who require regular monitoring.",
+    swiggyAddressId: "addr_kalyan_88",
+    cause_type: "eldercare",
+    resident_label: "Residents",
+    residents: 30,
+    website: "https://www.justdial.com/Mumbai/Dhanwantari-Old-Age-Home-Thane-West/022PXX22-XX22-120716182103-N9A9_BZDET",
+    needs: [
+      { id: "need_dhanwantari_01", name: "Tata Sampann Toor Dal 1kg", category: "GROCERY", quantity: 25, pledged: 15, delivered: 10, price: 190, type: "instamart", spinId: "sku_dal_1k" },
+      { id: "need_dhanwantari_02", name: "Fortune Mustard Oil 1L", category: "GROCERY", quantity: 20, pledged: 12, delivered: 8, price: 175, type: "instamart", spinId: "sku_oil_1l" },
+      { id: "need_dhanwantari_03", name: "Savlons Antiseptic Liquid Soap 500ml", category: "MEDICINE", quantity: 12, pledged: 5, delivered: 2, price: 145, type: "instamart", spinId: "sku_savlon_500" }
+    ]
+  },
+  {
+    id: "shelter_bal_asha",
+    name: "Bal Asha Trust",
+    type: "Orphanage & Children's Home",
+    city: "Mahalaxmi, Mumbai",
+    address: "King George V Memorial, Dr. E. Moses Road, Mahalaxmi, Mumbai 400011",
     avatar: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&q=80&w=150",
     cover: "https://images.unsplash.com/photo-1489659639091-8b687bc4386e?auto=format&fit=crop&q=80&w=800",
-    description: "A shelter home supporting 65 orphaned and vulnerable children. Providing quality education, healthy nutrition, and a vibrant environment to foster their dreams.",
-    swiggyAddressId: "addr_kalyan_88",
+    description: "Focuses on abandonment prevention, foster care, and providing quality nutrition and education to children.",
+    swiggyAddressId: "addr_paws_77",
+    cause_type: "child_welfare",
+    resident_label: "Children",
+    residents: 45,
+    website: "https://balashatrust.org",
     needs: [
-      { id: "need_kalyan_01", name: "Amul Taaza Fresh Milk 1L Pack", category: "GROCERY", quantity: 40, pledged: 30, delivered: 20, price: 74, type: "instamart", spinId: "sku_milk_1l" },
-      { id: "need_kalyan_02", name: "Dettol Liquid Handwash 1.5L Refill", category: "TOILETRIES", quantity: 10, pledged: 3, delivered: 1, price: 219, type: "instamart", spinId: "sku_dettol_1.5" },
-      { id: "need_kalyan_03", name: "Paneer Butter Masala & Garlic Naan Combo", category: "SPECIAL MEAL", quantity: 15, pledged: 0, delivered: 0, price: 340, type: "food", isSpecialMeal: true, favoriteFood: "Festive Butter Paneer Feast", restaurantId: "rest_haldiram" },
-      { id: "need_kalyan_04", name: "Wooden Ludo & Snakes Board Game", category: "ENTERTAINMENT", quantity: 5, pledged: 2, delivered: 1, price: 299, type: "instamart", spinId: "sku_ludo_board" }
+      { id: "need_bal_asha_01", name: "Milk Powder 1kg Pack", category: "GROCERY", quantity: 30, pledged: 0, delivered: 0, price: 250, type: "instamart", spinId: "sku_milk_powder" },
+      { id: "need_bal_asha_02", name: "Stationery School Kits Pack", category: "PERSONAL_CARE", quantity: 100, pledged: 0, delivered: 0, price: 180, type: "instamart", spinId: "sku_notebooks" },
+      { id: "need_bal_asha_03", name: "Baby Diapers Premium Pack", category: "PERSONAL_CARE", quantity: 50, pledged: 0, delivered: 0, price: 460, type: "instamart", spinId: "sku_diapers" }
     ]
   },
   {
-    id: "shelter_paws",
-    name: "Paws & Claws Rescue Home",
-    type: "Animal Welfare",
-    city: "Mumbai, MH",
-    address: "Gala No. 12, Marol Cooperative Industrial Estate, Andheri East, Mumbai - 400059",
+    id: "shelter_aasara",
+    name: "Aasara Bombay",
+    type: "Crisis Shelter",
+    city: "Thane, Mumbai",
+    address: "Lokmanya Tilak Nagar, Thane West, Mumbai 400606",
+    avatar: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&q=80&w=150",
+    cover: "https://images.unsplash.com/photo-1544027993-37dbfe43562a?auto=format&fit=crop&q=80&w=800",
+    description: "A 24-hour residential crisis shelter providing safety, rehabilitation, and education for street children.",
+    swiggyAddressId: "addr_aasha_99",
+    cause_type: "child_welfare",
+    resident_label: "Children",
+    residents: 300,
+    website: "https://www.aasara.org.in",
+    needs: [
+      { id: "need_aasara_01", name: "Dry Rations Pack 10kg", category: "GROCERY", quantity: 200, pledged: 60, delivered: 40, price: 460, type: "instamart", spinId: "sku_rations_large" },
+      { id: "need_aasara_02", name: "Notebooks Pack of 6", category: "PERSONAL_CARE", quantity: 150, pledged: 45, delivered: 10, price: 180, type: "instamart", spinId: "sku_school_kits" },
+      { id: "need_aasara_03", name: "School Shoes Black Pairs", category: "PERSONAL_CARE", quantity: 120, pledged: 36, delivered: 20, price: 350, type: "instamart", spinId: "sku_school_shoes" }
+    ]
+  },
+  {
+    id: "shelter_spca",
+    name: "Bombay SPCA & Animal Hospital",
+    type: "Animal Hospital",
+    city: "Parel, Mumbai",
+    address: "Dr. S.S. Rao Road, Parel, Mumbai 400012",
     avatar: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&q=80&w=150",
     cover: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=800",
-    description: "Providing shelter, medical care, and rehabilitation for 80+ rescued stray dogs, cats, and injured birds. Supported purely by community contributions.",
-    swiggyAddressId: "addr_paws_77",
+    description: "A dedicated animal hospital and trauma center offering 24/7 rescue and medical aid to stray animals.",
+    swiggyAddressId: "addr_kalyan_88",
+    cause_type: "animal_welfare",
+    resident_label: "Rescued Animals",
+    residents: 250,
+    website: "https://www.bombayspca.org",
     needs: [
-      { id: "need_paws_01", name: "Pedigree Chicken & Veg Dog Food 3kg", category: "ANIMAL FOOD", quantity: 25, pledged: 15, delivered: 10, price: 680, type: "instamart", spinId: "sku_pedigree_3k" },
-      { id: "need_paws_02", name: "Whiskas Dry Cat Food (Tuna) 1.2kg", category: "ANIMAL FOOD", quantity: 15, pledged: 8, delivered: 4, price: 410, type: "instamart", spinId: "sku_whiskas_1.2" },
-      { id: "need_paws_03", name: "Savlons Antiseptic Liquid Soap 500ml", category: "MEDICINE", quantity: 12, pledged: 5, delivered: 2, price: 145, type: "instamart", spinId: "sku_savlon_500" }
+      { id: "need_spca_01", name: "Antiseptics Sanitizer Liquid 1L", category: "MEDICINE", quantity: 50, pledged: 0, delivered: 0, price: 145, type: "instamart", spinId: "sku_savlon_1l" },
+      { id: "need_spca_02", name: "Bandages & Gauze Pack of 4", category: "MEDICINE", quantity: 100, pledged: 0, delivered: 0, price: 45, type: "instamart", spinId: "sku_gauze" },
+      { id: "need_spca_03", name: "Wet Animal Food Cans Combo", category: "GROCERY", quantity: 80, pledged: 0, delivered: 0, price: 460, type: "instamart", spinId: "sku_dog_kibble" }
+    ]
+  },
+  {
+    id: "shelter_amtm",
+    name: "Animal Matters To Me (AMTM)",
+    type: "Animal Sanctuary",
+    city: "Malad West, Mumbai",
+    address: "Marve Road, Behind Juhu Club, Malad West, Mumbai 400095",
+    avatar: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&q=80&w=150",
+    cover: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=800",
+    description: "A permanent sanctuary and rehab facility for disabled, blind, and paralyzed stray dogs, cats, and birds.",
+    swiggyAddressId: "addr_kalyan_88",
+    cause_type: "animal_welfare",
+    resident_label: "Rescued Animals",
+    residents: 110,
+    website: "https://www.amtmindia.org",
+    needs: [
+      { id: "need_amtm_01", name: "Dog Kibble Pack 5kg", category: "GROCERY", quantity: 40, pledged: 28, delivered: 20, price: 460, type: "instamart", spinId: "sku_canin_dog" },
+      { id: "need_amtm_02", name: "Rice Grains Bag 10kg", category: "GROCERY", quantity: 30, pledged: 21, delivered: 15, price: 320, type: "instamart", spinId: "sku_rice_10g" },
+      { id: "need_amtm_03", name: "Tarpaulins Waterproof Sheets", category: "PERSONAL_CARE", quantity: 20, pledged: 14, delivered: 10, price: 499, type: "instamart", spinId: "sku_tarpaulins" }
     ]
   }
 ];
 
-// Active Orders/Pledges Queue
-let PLEDGES_QUEUE = [
+const DEFAULT_PLEDGES_QUEUE = [
   {
     id: "ord_101",
-    shelterId: "shelter_aasha",
-    donorName: "Rohan Sharma",
+    shelterId: "shelter_banyan",
+    donorName: "Ananya Iyer",
     itemName: "Aashirvaad Shudh Chakki Atta 10kg",
     category: "GROCERY",
     quantity: 3,
     amount: 1380,
     swiggyOrderId: "sw_order_gro_9988",
-    status: "delivered", // delivered, in_transit, placed, pledged
-    type: "instamart"
+    status: "delivered",
+    type: "instamart",
+    date: "29 May 2026"
   },
   {
     id: "ord_102",
-    shelterId: "shelter_kalyan",
-    donorName: "Ananya Iyer",
+    shelterId: "shelter_manav",
+    donorName: "Sunil Kumar",
     itemName: "Amul Taaza Fresh Milk 1L Pack",
     category: "GROCERY",
     quantity: 10,
@@ -80,9 +192,28 @@ let PLEDGES_QUEUE = [
     swiggyOrderId: "sw_order_gro_2234",
     status: "in_transit",
     type: "instamart",
-    deliveryProgress: 45 // Percentage along the road
+    deliveryProgress: 45,
+    date: "30 May 2026"
   }
 ];
+
+let SHELTERS_DB = [];
+let PLEDGES_QUEUE = [];
+
+const DB_VERSION = "v5";
+
+function initDatabase() {
+  // Always load from defaults to reset on page reload/refresh
+  SHELTERS_DB = JSON.parse(JSON.stringify(DEFAULT_SHELTERS_DB));
+  PLEDGES_QUEUE = JSON.parse(JSON.stringify(DEFAULT_PLEDGES_QUEUE));
+}
+
+function saveDatabase() {
+  // Do not persist to localStorage so that refresh resets state
+}
+
+// Initialize on execution
+initDatabase();
 
 // ==========================================
 // UI / State Variables
@@ -92,6 +223,8 @@ let activeView = "donor"; // donor | admin
 let selectedShelter = SHELTERS_DB[0];
 let activeCheckoutNeed = null;
 let currentTrackingOrder = null;
+let activeCauseFilter = "all";
+let activeDetailsOrderId = null;
 
 // ==========================================
 // Swiggy MCP Logger Engine
@@ -402,16 +535,19 @@ async function triggerSwiggyMcpOrderWorkflow(need, quantity, donorName) {
     status: "placed",
     type: need.type,
     deliveryProgress: 15,
-    eta: orderConfirmation.etaMinutes
+    eta: orderConfirmation.etaMinutes,
+    date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
   };
 
   PLEDGES_QUEUE.unshift(newOrder);
 
   // Update original needs tally (mock update database)
   need.pledged += quantity;
+  saveDatabase();
 
   // Refresh UI dashboards
   renderShelters();
+  renderDonationHistory();
   renderAdminPanel();
 
   // Run live mapping tracker simulation for this order
@@ -452,13 +588,21 @@ function runDeliverySimulation(order) {
       if (need) {
         need.delivered = Math.min(need.quantity, need.delivered + order.quantity);
       }
+      saveDatabase();
       
       logToConsole("info", `DELIVERED! Swiggy partner completed drop-off at shelter doorstep. Order ID: ${order.swiggyOrderId}`, null);
       renderShelters();
+      renderDonationHistory();
       renderAdminPanel();
     } else {
       order.status = "in_transit";
+      renderDonationHistory();
       renderAdminPanel();
+    }
+
+    // Re-render modal if open
+    if (activeDetailsOrderId === order.id) {
+      openDonationDetailsModal(order.id);
     }
   }, 10000); // Progress updates every 10 seconds (as recommended by docs to prevent rate limit)
 }
@@ -471,7 +615,11 @@ function renderShelters() {
   const grid = document.getElementById("shelter-grid");
   if (!grid) return;
 
-  grid.innerHTML = SHELTERS_DB.map(shelter => {
+  const filteredShelters = activeCauseFilter === "all"
+    ? SHELTERS_DB
+    : SHELTERS_DB.filter(s => s.cause_type === activeCauseFilter);
+
+  grid.innerHTML = filteredShelters.map(shelter => {
     // Count active needs
     const unmetCount = shelter.needs.filter(n => n.pledged < n.quantity).length;
     const tagHtml = shelter.needs.slice(0, 3).map(n => {
@@ -486,11 +634,17 @@ function renderShelters() {
           <div class="shelter-avatar" style="background-image: url('${shelter.avatar}')"></div>
         </div>
         <div class="shelter-content">
-          <h3 class="shelter-title">${shelter.name}</h3>
+          <h3 class="shelter-title" style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; width: 100%;">
+            <span>${shelter.name}</span>
+            <a href="${shelter.website || '#'}" target="_blank" class="info-search-btn" title="Visit Official Website">i</a>
+          </h3>
           <div class="shelter-location">
             <span>📍</span> ${shelter.city}
           </div>
-          <p class="shelter-desc">${shelter.description}</p>
+          <div class="shelter-residents" style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem; display: flex; align-items: center; gap: 0.25rem;">
+            <span>👥</span> ${shelter.residents} ${shelter.resident_label || "Residents"}
+          </div>
+          <p class="shelter-desc" style="margin-top: 0.5rem;">${shelter.description}</p>
           <div class="needs-summary">
             <div class="needs-summary-title">Supplies Needed (${unmetCount})</div>
             <div class="needs-summary-list">
@@ -564,6 +718,10 @@ function openNeedsDrawer(shelterId) {
 
 function closeNeedsDrawer() {
   document.getElementById("needs-drawer").classList.remove("open");
+  document.getElementById("checkout-modal").classList.remove("open");
+  const detailsModal = document.getElementById("donation-details-modal");
+  if (detailsModal) detailsModal.classList.remove("open");
+  activeDetailsOrderId = null;
   document.getElementById("drawer-overlay").classList.remove("open");
 }
 
@@ -646,11 +804,11 @@ async function handlePaymentSubmit() {
     <p style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-secondary)">
       Thank you for donating <strong>${qty}x ${activeCheckoutNeed.name}</strong> to ${selectedShelter.name}.
     </p>
-    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 6px; padding: 0.75rem; margin-top: 1rem; font-family: var(--font-mono); font-size: 0.8rem; text-align: left;">
-      <div>Swiggy Order: <strong style="color: var(--secondary)">${newOrder.swiggyOrderId}</strong></div>
+    <div style="background: rgba(27, 36, 33, 0.02); border: 1px solid var(--border); border-radius: 6px; padding: 0.75rem; margin-top: 1rem; font-family: var(--font-mono); font-size: 0.8rem; text-align: left;">
+      <div>Pledge Ref: <strong style="color: var(--secondary)">${newOrder.swiggyOrderId}</strong></div>
       <div>Delivery: <span class="badge-status placed" style="padding: 0.1rem 0.4rem; font-size: 0.65rem;">Placed</span></div>
       <div style="margin-top: 0.25rem; font-size: 0.75rem; color: var(--text-secondary)">
-        Staging COD financed. Checking out to logged address ID. You can monitor this live on the Admin Dashboard!
+        Staging pledge finalized. Direct delivery to the verified nursing home doorstep is logged. You can monitor this live on the Admin Dashboard!
       </div>
     </div>
   `;
@@ -770,10 +928,10 @@ const ITEMS_CATALOG = {
     { name: "Antiseptic Liquid Solution", unitType: "liquid" },
     { name: "First Aid Dressing Kit", unitType: "discrete" }
   ],
-  "ANIMAL FOOD": [
-    { name: "Pedigree Dry Dog Food", unitType: "weight" }, // Pets can have bulk weights!
-    { name: "Whiskas Wet Cat Food", unitType: "discrete" },
-    { name: "Stray Animal Nutrition Biscuits", unitType: "weight" }
+  "PERSONAL_CARE": [
+    { name: "Adult Diaper Pack", unitType: "discrete" },
+    { name: "Savlons Antiseptic Soap", unitType: "discrete" },
+    { name: "Moisturizing Skin Lotion", unitType: "liquid" }
   ],
   "ENTERTAINMENT": [
     { name: "Wooden Ludo & Snakes Board", unitType: "discrete" },
@@ -883,12 +1041,12 @@ function calculateAutomaticPrice(category, name, size) {
     return 45;
   }
   
-  // Animal Welfare
-  if (category === "ANIMAL FOOD") {
-    if (size === "10kg") return 1900;
-    if (size === "5kg") return 950;
-    if (size === "3kg" || size === "1.2kg" || size === "1kg") return 410;
-    return 150;
+  // Personal Care & Hygiene
+  if (category === "PERSONAL_CARE") {
+    if (size === "Pack of 4") return 180;
+    if (size === "1L") return 240;
+    if (size === "500ml") return 130;
+    return 350;
   }
   
   // Toys & Entertainment
@@ -936,6 +1094,7 @@ function handleAddNeedSubmit(event) {
   };
 
   selectedShelter.needs.push(newNeed);
+  saveDatabase();
   
   logToConsole("info", `Admin added new need: "${name}" | Goal: ${qty} units | Automatic Price Locked: ₹${price} (calculated via catalog size mapping)`, null);
 
@@ -960,6 +1119,21 @@ function selectAdminShelter(shelterId) {
   renderAdminPanel();
 }
 
+function setCauseFilter(causeType) {
+  activeCauseFilter = causeType;
+  
+  // Toggle active styling on buttons
+  const buttons = ["all", "eldercare", "child_welfare", "animal_welfare"];
+  buttons.forEach(btn => {
+    const el = document.getElementById(`cause-btn-${btn}`);
+    if (el) {
+      el.classList.toggle("active", btn === causeType);
+    }
+  });
+  
+  renderShelters();
+}
+
 // ==========================================
 // Initialization & Tab Controls
 // ==========================================
@@ -977,20 +1151,293 @@ function switchView(view) {
   if (view === "admin") {
     // Populate admin sidebar select
     const sidebarList = document.getElementById("admin-shelter-select-list");
-    sidebarList.innerHTML = SHELTERS_DB.map(s => `
-      <button class="shelter-select-btn ${s.id === selectedShelter.id ? 'active' : ''}" 
-              data-id="${s.id}" onclick="selectAdminShelter('${s.id}')">
-        <img src="${s.avatar}" alt="${s.name}"/>
-        <div class="btn-text">
-          <h4>${s.name}</h4>
-          <p>${s.city}</p>
-        </div>
-      </button>
-    `).join('');
+    if (sidebarList) {
+      sidebarList.innerHTML = SHELTERS_DB.map(s => `
+        <button class="shelter-select-btn ${s.id === selectedShelter.id ? 'active' : ''}" 
+                data-id="${s.id}" onclick="selectAdminShelter('${s.id}')">
+          <img src="${s.avatar}" alt="${s.name}"/>
+          <div class="btn-text">
+            <h4>${s.name}</h4>
+            <p>${s.city}</p>
+          </div>
+        </button>
+      `).join('');
+    }
 
     renderAdminPanel();
   } else {
     renderShelters();
+    renderDonationHistory();
+  }
+}
+
+// ==========================================
+// Donation History Sidebar & Details Modal
+// ==========================================
+
+function renderDonationHistory() {
+  const historyList = document.getElementById("donor-history-list");
+  if (!historyList) return;
+
+  // Calculate stats for Tushar Bhatia
+  const userPledges = PLEDGES_QUEUE.filter(o => o.donorName === "Tushar Bhatia");
+  const totalAmount = userPledges.reduce((sum, o) => sum + o.amount, 0);
+  const totalCount = userPledges.length;
+
+  // Update Stats UI
+  const totalEl = document.getElementById("donor-stats-total");
+  const countEl = document.getElementById("donor-stats-count");
+  if (totalEl) totalEl.innerText = `₹${totalAmount.toLocaleString('en-IN')}`;
+  if (countEl) countEl.innerText = totalCount;
+
+  if (userPledges.length === 0) {
+    historyList.innerHTML = `
+      <div style="text-align: center; color: var(--text-secondary); padding: 1.5rem; font-size: 0.85rem;">
+        No donations made yet.
+      </div>
+    `;
+    return;
+  }
+
+  historyList.innerHTML = userPledges.map(order => {
+    const shelter = SHELTERS_DB.find(s => s.id === order.shelterId) || { name: "Verified Shelter", city: "Mumbai" };
+    
+    // Choose emoji based on category or name
+    let emoji = "💝";
+    const cat = (order.category || "").toUpperCase();
+    if (cat.includes("GROCERY")) emoji = "🌾";
+    else if (cat.includes("TOILETRIES")) emoji = "🧼";
+    else if (cat.includes("MEDICINE")) emoji = "💊";
+    else if (cat.includes("PERSONAL")) emoji = "🪥";
+    else if (cat.includes("ENTERTAINMENT")) emoji = "🎮";
+    else if (cat.includes("SPECIAL")) emoji = "🍲";
+
+    const statusLabel = order.status.replace('_', ' ');
+
+    return `
+      <div class="history-item" onclick="openDonationDetailsModal('${order.id}')" data-order-id="${order.id}">
+        <div class="history-icon">${emoji}</div>
+        <div class="history-details">
+          <h4>${order.itemName}</h4>
+          <p>${shelter.name}</p>
+          <span style="font-size: 0.65rem; color: var(--text-secondary);">${order.date || 'Today'}</span>
+        </div>
+        <div class="history-meta">
+          <span class="history-amount">₹${order.amount}</span>
+          <span class="history-status ${order.status}">${statusLabel}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openDonationDetailsModal(orderId) {
+  activeDetailsOrderId = orderId;
+  const order = PLEDGES_QUEUE.find(o => o.id === orderId);
+  if (!order) return;
+
+  const shelter = SHELTERS_DB.find(s => s.id === order.shelterId) || {
+    name: "Verified Shelter",
+    city: "Mumbai",
+    address: "Mumbai, India",
+    website: "#"
+  };
+
+  const modal = document.getElementById("donation-details-modal");
+  const body = document.getElementById("details-modal-body");
+  if (!modal || !body) return;
+
+  let statusEmoji = "📦";
+  let statusColor = "var(--primary)";
+  let statusDesc = "";
+  if (order.status === "delivered") {
+    statusEmoji = "✅";
+    statusColor = "#10B981";
+    statusDesc = "Delivered to the shelter doorstep.";
+  } else if (order.status === "in_transit") {
+    statusEmoji = "🛵";
+    statusColor = "#06B6D4";
+    statusDesc = `In Transit. Delivery partner is on the way (ETA: ~${order.eta || 10} mins).`;
+  } else {
+    statusEmoji = "📦";
+    statusColor = "#3B82F6";
+    statusDesc = "Order placed successfully. Waiting for dispatch.";
+  }
+
+  let progressHtml = "";
+  if (order.status !== "delivered") {
+    const progress = order.deliveryProgress || 15;
+    progressHtml = `
+      <div style="margin-top: 1rem;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.25rem;">
+          <span>Delivery Progress</span>
+          <span>${progress}%</span>
+        </div>
+        <div class="progress-bar-container" style="height: 8px; border-radius: 4px; overflow: hidden; background: var(--border);">
+          <div class="progress-bar" style="width: ${progress}%; background: var(--secondary); height: 100%; transition: width 0.3s ease;"></div>
+        </div>
+        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.4rem; display: flex; align-items: center; gap: 0.25rem;">
+          <span>🛵</span> Live delivery partner: <strong>Ramesh (98888)</strong>
+        </div>
+      </div>
+    `;
+  } else {
+    progressHtml = `
+      <div style="margin-top: 1rem; background: rgba(16, 185, 129, 0.05); border: 1px dashed #10B981; border-radius: var(--radius-sm); padding: 0.75rem; display: flex; align-items: center; gap: 0.5rem; color: #10B981; font-size: 0.8rem;">
+        <span>🎉</span> <strong>Delivery Completed!</strong> Handed over to ${shelter.name} representative.
+      </div>
+    `;
+  }
+
+  // Calculate bill breakdown
+  const deliveryFee = 39;
+  const subtotal = Math.max(0, Math.round((order.amount - deliveryFee) / 1.05));
+  const taxes = order.amount - subtotal - deliveryFee;
+
+  body.innerHTML = `
+    <div style="padding: 1rem; display: flex; flex-direction: column; gap: 1rem;">
+      
+      <!-- Status Card -->
+      <div style="display: flex; align-items: center; gap: 0.75rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.85rem;">
+        <div style="font-size: 1.8rem;">${statusEmoji}</div>
+        <div>
+          <div style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: ${statusColor};">
+            ${order.status.replace('_', ' ')}
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem; line-height: 1.3;">
+            ${statusDesc}
+          </div>
+        </div>
+      </div>
+
+      <!-- Item details -->
+      <div>
+        <h4 style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 0.35rem; font-weight: 600;">Donated Item</h4>
+        <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.65rem;">
+          <div>
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">${order.itemName}</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">Quantity: ${order.quantity} units</div>
+          </div>
+          <div style="font-size: 0.95rem; font-weight: 800; color: var(--primary);">₹${order.amount.toLocaleString('en-IN')}</div>
+        </div>
+      </div>
+
+      <!-- Shelter details -->
+      <div>
+        <h4 style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 0.35rem; font-weight: 600;">Beneficiary Shelter</h4>
+        <div style="background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.65rem;">
+          <div style="font-weight: 700; font-size: 0.85rem; color: var(--text-primary); display: flex; align-items: center; justify-content: space-between;">
+            <span>${shelter.name}</span>
+            <a href="${shelter.website || '#'}" target="_blank" style="font-size: 0.75rem; color: var(--primary); text-decoration: underline;">Website ↗</a>
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem; line-height: 1.35;">
+            📍 ${shelter.address || shelter.city}
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment & Bill Details -->
+      <div>
+        <h4 style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 0.35rem; font-weight: 600;">Bill Breakdown</h4>
+        <div style="background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.65rem; font-size: 0.8rem; display: flex; flex-direction: column; gap: 0.25rem;">
+          <div style="display: flex; justify-content: space-between; color: var(--text-secondary);">
+            <span>Subtotal:</span>
+            <span>₹${subtotal}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; color: var(--text-secondary);">
+            <span>Delivery Fee:</span>
+            <span>₹${deliveryFee}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; color: var(--text-secondary);">
+            <span>GST & Packaging:</span>
+            <span>₹${taxes}</span>
+          </div>
+          <hr style="border: 0; border-top: 1px solid var(--border); margin: 0.35rem 0;">
+          <div style="display: flex; justify-content: space-between; font-weight: 700; color: var(--text-primary);">
+            <span>Total Amount Paid:</span>
+            <span>₹${order.amount}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Meta -->
+      <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-secondary); border-top: 1px solid var(--border); padding-top: 0.5rem; margin-top: 0.25rem;">
+        <span>Date: <strong>${order.date || 'Today'}</strong></span>
+        <span>Order ID: <strong style="font-family: var(--font-mono);">${order.swiggyOrderId}</strong></span>
+      </div>
+
+      <!-- Live Progress -->
+      ${progressHtml}
+
+    </div>
+  `;
+
+  modal.classList.add("open");
+  document.getElementById("drawer-overlay").classList.add("open");
+}
+
+function closeDonationDetailsModal() {
+  activeDetailsOrderId = null;
+  document.getElementById("donation-details-modal").classList.remove("open");
+  
+  const detailsOpen = document.getElementById("donation-details-modal").classList.contains("open");
+  const checkoutOpen = document.getElementById("checkout-modal").classList.contains("open");
+  const drawerOpen = document.getElementById("needs-drawer").classList.contains("open");
+  
+  if (!detailsOpen && !checkoutOpen && !drawerOpen) {
+    document.getElementById("drawer-overlay").classList.remove("open");
+  }
+}
+
+function goToDonationHistory() {
+  // Close modals
+  document.getElementById("checkout-modal").classList.remove("open");
+  document.getElementById("donation-details-modal").classList.remove("open");
+  document.getElementById("needs-drawer").classList.remove("open");
+  document.getElementById("drawer-overlay").classList.remove("open");
+
+  // Ensure donor view is active
+  switchView('donor');
+
+  // Scroll sidebar into view smoothly
+  const sidebar = document.getElementById("donor-sidebar-panel");
+  if (sidebar) {
+    sidebar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  // Add flash-highlight classes to first history item
+  setTimeout(() => {
+    const firstItem = document.querySelector("#donor-history-list .history-item");
+    if (firstItem) {
+      firstItem.classList.add("flash-highlight");
+      // Remove class after animation finishes (1.5s)
+      firstItem.addEventListener("animationend", () => {
+        firstItem.classList.remove("flash-highlight");
+      }, { once: true });
+    }
+  }, 500);
+}
+
+function toggleSidebar() {
+  const sidebar = document.getElementById("donor-sidebar-panel");
+  const layout = document.querySelector(".donor-view-layout");
+  const btn = document.querySelector(".sidebar-toggle-btn");
+  
+  if (sidebar && layout) {
+    sidebar.classList.toggle("collapsed");
+    layout.classList.toggle("sidebar-collapsed");
+    
+    if (sidebar.classList.contains("collapsed")) {
+      if (btn) {
+        btn.innerText = "▶";
+        btn.title = "Expand Sidebar";
+      }
+    } else {
+      if (btn) {
+        btn.innerText = "◀ Collapse";
+        btn.title = "Collapse Sidebar";
+      }
+    }
   }
 }
 
@@ -998,7 +1445,14 @@ function switchView(view) {
 window.addEventListener("DOMContentLoaded", () => {
   clearConsole();
   renderShelters();
+  renderDonationHistory();
   
+  // Set default donor name
+  const donorInput = document.getElementById("donor-name-input");
+  if (donorInput) {
+    donorInput.value = "Tushar Bhatia";
+  }
+
   // Set up add need listener
   const form = document.getElementById("admin-add-need-form");
   if (form) form.addEventListener("submit", handleAddNeedSubmit);
@@ -1022,13 +1476,40 @@ window.addEventListener("DOMContentLoaded", () => {
           if (need) {
             need.delivered = Math.min(need.quantity, need.delivered + order.quantity);
           }
+          saveDatabase();
           logToConsole("info", `DELIVERED! Mock order ${order.swiggyOrderId} successfully completed.`, null);
           renderShelters();
         } else {
           order.status = "in_transit";
         }
+
+        // Re-render modal if open
+        if (activeDetailsOrderId === order.id) {
+          openDonationDetailsModal(order.id);
+        }
       }
     });
+    saveDatabase();
+    renderDonationHistory();
     if (activeView === "admin") renderAdminPanel();
   }, 12000);
 });
+
+// Export handlers to window for ESM / Vite compatibility
+window.switchView = switchView;
+window.clearConsole = clearConsole;
+window.closeNeedsDrawer = closeNeedsDrawer;
+window.openNeedsDrawer = openNeedsDrawer;
+window.openCheckoutModal = openCheckoutModal;
+window.closeCheckoutModal = closeCheckoutModal;
+window.calculateCheckoutBill = calculateCheckoutBill;
+window.handlePaymentSubmit = handlePaymentSubmit;
+window.selectAdminShelter = selectAdminShelter;
+window.handleCategoryChange = handleCategoryChange;
+window.handleItemChange = handleItemChange;
+window.setCauseFilter = setCauseFilter;
+window.renderDonationHistory = renderDonationHistory;
+window.goToDonationHistory = goToDonationHistory;
+window.openDonationDetailsModal = openDonationDetailsModal;
+window.closeDonationDetailsModal = closeDonationDetailsModal;
+window.toggleSidebar = toggleSidebar;
