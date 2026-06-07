@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Need Feed — Connecting Donors to Verified Causes</title>
   <meta name="description" content="Connecting donors to verified shelters and causes — one supply at a time.">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
 
@@ -22,16 +22,26 @@
     <!-- Tab Controls -->
     <div class="view-selector">
       <button class="view-btn active" id="view-btn-donor" onclick="switchView('donor')">
-        <span>💝</span> Donor App
+        Donor App
       </button>
       <button class="view-btn" id="view-btn-admin" onclick="switchView('admin')">
-        <span>🏡</span> Shelter Admin Portal
+        Shelter Admin Portal
+      </button>
+      <button class="view-btn" id="view-btn-mcp" onclick="switchView('mcp')">
+        MCP Flow
       </button>
     </div>
     
-    <div style="font-size: 0.8rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.5rem;">
-      <span style="background: rgba(29, 158, 117, 0.2); color: var(--primary); padding: 0.2rem 0.5rem; border-radius: 20px; font-weight: 700;">ACTIVE</span>
-      <span>Need Feed Platform v2.0</span>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <div style="font-size: 0.8rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.5rem;">
+        <span style="background: rgba(29, 158, 117, 0.2); color: var(--primary); padding: 0.2rem 0.5rem; border-radius: 20px; font-weight: 700;">ACTIVE</span>
+        <span>Need Feed Platform v2.0</span>
+      </div>
+      
+      <!-- Theme Mode Toggle -->
+      <button class="theme-toggle-btn" id="theme-toggle-btn" title="Switch to Dark Mode">
+        <span class="theme-icon">☾</span>
+      </button>
     </div>
   </header>
 
@@ -55,9 +65,9 @@
             <!-- Horizontal button Cause Selector row -->
             <div class="cause-selector-row" id="cause-filter-row" style="margin-bottom: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
               <button class="view-btn active" onclick="setCauseFilter('all')" id="cause-btn-all">All Causes</button>
-              <button class="view-btn" onclick="setCauseFilter('eldercare')" id="cause-btn-eldercare">👵 Eldercare</button>
-              <button class="view-btn" onclick="setCauseFilter('child_welfare')" id="cause-btn-child_welfare">👶 Child Welfare</button>
-              <button class="view-btn" onclick="setCauseFilter('animal_welfare')" id="cause-btn-animal_welfare">🐾 Animal Welfare</button>
+              <button class="view-btn" onclick="setCauseFilter('eldercare')" id="cause-btn-eldercare">Eldercare</button>
+              <button class="view-btn" onclick="setCauseFilter('child_welfare')" id="cause-btn-child_welfare">Child Welfare</button>
+              <button class="view-btn" onclick="setCauseFilter('animal_welfare')" id="cause-btn-animal_welfare">Animal Welfare</button>
             </div>
 
             <div class="donor-grid" id="shelter-grid">
@@ -102,50 +112,12 @@
       <div class="app-view" id="view-admin">
         <div class="admin-section">
           
-          <!-- Admin Sidebar: Selector & Action Forms -->
+          <!-- Admin Sidebar: Selector -->
           <aside class="admin-sidebar">
             <h3 class="shelter-selector-title">Select Active Shelter</h3>
             <div id="admin-shelter-select-list">
               <!-- Populated dynamically via app.js -->
             </div>
-            
-            <hr style="border: 0; border-top: 1px solid var(--border); margin: 1.5rem 0;">
-            
-            <!-- ADD NEW NEED FORM -->
-            <form id="admin-add-need-form">
-              <h3 class="shelter-selector-title" style="margin-bottom: 1rem;">Post Supply Requirement</h3>
-              
-              <div class="form-group">
-                <label for="need-category-select">Supply Category</label>
-                <select class="form-control" id="need-category-select" onchange="handleCategoryChange()">
-                  <option value="GROCERY">Grocery Grains (Instamart)</option>
-                  <option value="TOILETRIES">Toiletries & Cleaners (Instamart)</option>
-                  <option value="MEDICINE">First Aid / Medicines (Instamart)</option>
-                  <option value="PERSONAL_CARE">Personal Care & Hygiene (Instamart)</option>
-                  <option value="ENTERTAINMENT">Toys & Entertainment (Instamart)</option>
-                  <option value="SPECIAL_MEAL">Hot Restaurant Special Meal (Food MCP)</option>
-                </select>
-              </div>
-              
-              <div class="form-group">
-                <label for="need-name-select">Select Supply Item</label>
-                <select class="form-control" id="need-name-select" onchange="handleItemChange()"></select>
-              </div>
-              
-              <div class="form-group">
-                <label for="need-qty-input">Total Target Quantity</label>
-                <input type="number" class="form-control" id="need-qty-input" value="10" min="1" required>
-              </div>
-              
-              <div class="form-group" id="form-group-variant">
-                <label for="need-variant-select">Variant / Pack Size</label>
-                <select class="form-control" id="need-variant-select"></select>
-              </div>
-              
-              <button class="btn btn-primary" type="submit">
-                <span>➕</span> Post Need Board
-              </button>
-            </form>
           </aside>
           
           <!-- Admin Dashboard Content -->
@@ -153,9 +125,14 @@
             
             <!-- Shelter active goal tracker -->
             <div class="admin-card">
-              <div class="admin-card-header">
-                <h3>Active Needs Tally</h3>
-                <span style="font-size: 0.8rem; color: var(--text-secondary);">Real-time procurement progress</span>
+              <div class="admin-card-header" style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+                <div>
+                  <h3>Active Needs Tally</h3>
+                  <span style="font-size: 0.8rem; color: var(--text-secondary);">Real-time procurement progress</span>
+                </div>
+                <button class="btn btn-primary" onclick="openAddNeedModal()" style="width: auto; padding: 0.45rem 1rem; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 0.25rem; border-radius: 6px;">
+                  + Add Need
+                </button>
               </div>
               <div id="admin-needs-list">
                 <!-- Populated dynamically via app.js -->
@@ -177,6 +154,102 @@
           
         </div>
       </div>
+
+      <!-- VIEW 3: Swiggy MCP Flow Playground -->
+      <div class="app-view" id="view-mcp">
+        <div class="mcp-layout">
+          
+          <!-- Left Panel: Flow Details & Interactive Agent Simulation -->
+          <div class="mcp-card">
+            <div>
+              <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.25rem;">Swiggy MCP Integration Flow</h2>
+              <p style="color: var(--text-secondary); font-size: 0.9rem;">Exposing Instamart & Food Delivery capabilities to LLM Agents via standard Model Context Protocol (MCP).</p>
+            </div>
+            
+            <hr style="border: 0; border-top: 1px solid var(--border); margin: 0.5rem 0;">
+            
+            <!-- Prompt Simulator Block -->
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">Test Agent Prompt (Instamart & Food MCP Simulation)</h3>
+              <div class="form-group" style="margin-bottom: 0.5rem;">
+                <input type="text" class="form-control" id="mcp-prompt-input" placeholder="e.g., Buy 10 units of Aashirvaad Atta for C.U. Shah Home" style="font-size: 0.85rem;">
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <button class="btn btn-primary" onclick="runMcpSimulation()" style="width: auto; padding: 0.5rem 1rem; font-size: 0.85rem;">
+                  Run Agent Simulation
+                </button>
+                <button class="btn btn-secondary" onclick="clearMcpTerminal()" style="width: auto; padding: 0.5rem 1rem; font-size: 0.85rem;">
+                  Clear Console
+                </button>
+              </div>
+              
+              <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">Or try a quick sample flow:</div>
+              <div class="chip-group">
+                <button class="suggestion-chip" onclick="setMcpPrompt('Buy 5 bags of Atta for C.U. Shah Home')">Sponsor Atta</button>
+                <button class="suggestion-chip" onclick="setMcpPrompt('Send 15 Paneer combos to Dhanwantari Home')">Send Special Meal</button>
+                <button class="suggestion-chip" onclick="setMcpPrompt('Order 10 handwashes for Adharwad Home')">Supply Toiletries</button>
+              </div>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--border); margin: 0.5rem 0;">
+
+            <!-- Flow Chart Diagram -->
+            <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem;">MCP Architecture Workflow</h3>
+            <div class="mcp-flow-diagram">
+              <div class="flow-step">
+                <div class="flow-step-number">1</div>
+                <div class="flow-step-content">
+                  <strong>User Intent Input</strong>
+                  <span>Supporter triggers donation or admin posts requirements.</span>
+                </div>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-step">
+                <div class="flow-step-number">2</div>
+                <div class="flow-step-content">
+                  <strong>LLM Agent Reasoning</strong>
+                  <span>LLM parses request, determines shelter target, and selects matching Swiggy MCP tools.</span>
+                </div>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-step">
+                <div class="flow-step-number">3</div>
+                <div class="flow-step-content">
+                  <strong>JSON-RPC Server Call</strong>
+                  <span>Agent dispatches standard JSON-RPC queries to the Swiggy MCP Host.</span>
+                </div>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="flow-step">
+                <div class="flow-step-number">4</div>
+                <div class="flow-step-content">
+                  <strong>Instamart & Food APIs Dispatch</strong>
+                  <span>Swiggy API matches items, manages cart, completes checkout, and returns order ID.</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          
+          <!-- Right Panel: High-Tech Protocol JSON-RPC Terminal -->
+          <div class="mcp-card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
+            <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); background: var(--surface); display: flex; align-items: center; justify-content: space-between;">
+              <div>
+                <h3 style="font-size: 0.95rem; font-weight: 700;">Swiggy MCP JSON-RPC Protocol Terminal</h3>
+                <span style="font-size: 0.75rem; color: var(--text-secondary);">Live client-server communication log</span>
+              </div>
+              <span style="background: rgba(16, 185, 129, 0.1); color: #10B981; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700; font-family: var(--font-mono);">ONLINE</span>
+            </div>
+            
+            <div class="mcp-terminal" id="mcp-terminal-console">
+              <!-- Logs populated dynamically -->
+              <div class="log-line">--- Swiggy Model Context Protocol (MCP) Terminal Connected ---</div>
+              <div class="log-line">Type a prompt or click a sample flow to simulate agent tools execution...</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
       
     </div>
     
@@ -194,7 +267,10 @@
         <h2 id="drawer-shelter-name">Aasha Shelter Home</h2>
         <p id="drawer-shelter-desc">Varanasi, UP</p>
       </div>
-      <button class="drawer-close" onclick="closeNeedsDrawer()">×</button>
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <button class="btn btn-secondary drawer-expand-btn" onclick="toggleExpandNeedsDrawer()" style="padding: 0.35rem 0.75rem; font-size: 0.75rem; border-radius: 4px; border: 1px solid var(--border); font-weight: 600; cursor: pointer;">Expand Window</button>
+        <button class="drawer-close" onclick="closeNeedsDrawer()">×</button>
+      </div>
     </div>
     <div class="drawer-body" id="drawer-needs-list">
       <!-- Shelter items populated dynamically -->
@@ -260,7 +336,6 @@
       </div>
 
       <div class="co-brand-note">
-        <span style="font-size: 1.25rem;">🤝</span>
         <div>
           Need Feed partner network matches 10% of this donation! Placing this order will log a pledge for direct delivery to the home.
         </div>
@@ -309,6 +384,52 @@
     </button>
   </div>
 
-  <script src="app.js"></script>
+  <!-- DYNAMIC ADD NEED MODAL -->
+  <div class="checkout-modal" id="admin-add-need-modal">
+    <div class="checkout-header">
+      <div class="checkout-title">
+        <h3>Post Supply Requirement</h3>
+        <p style="font-size: 0.8rem; color: var(--text-secondary);">Request a new supply need for the shelter</p>
+      </div>
+      <button class="drawer-close" onclick="closeAddNeedModal()">×</button>
+    </div>
+    <div class="drawer-body" style="padding: 1.5rem;">
+      <form id="admin-add-need-form" onsubmit="handleAddNeedSubmit(event)">
+        
+        <div class="form-group">
+          <label for="need-category-select">Supply Category</label>
+          <select class="form-control" id="need-category-select" onchange="handleCategoryChange()">
+            <option value="GROCERY">Grocery Grains (Instamart)</option>
+            <option value="TOILETRIES">Toiletries & Cleaners (Instamart)</option>
+            <option value="MEDICINE">First Aid / Medicines (Instamart)</option>
+            <option value="PERSONAL_CARE">Personal Care & Hygiene (Instamart)</option>
+            <option value="ENTERTAINMENT">Toys & Entertainment (Instamart)</option>
+            <option value="SPECIAL_MEAL">Hot Restaurant Special Meal (Food MCP)</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="need-name-select">Select Supply Item</label>
+          <select class="form-control" id="need-name-select" onchange="handleItemChange()"></select>
+        </div>
+        
+        <div class="form-group">
+          <label for="need-qty-input">Total Target Quantity</label>
+          <input type="number" class="form-control" id="need-qty-input" value="10" min="1" required>
+        </div>
+        
+        <div class="form-group" id="form-group-variant">
+          <label for="need-variant-select">Variant / Pack Size</label>
+          <select class="form-control" id="need-variant-select"></select>
+        </div>
+        
+        <button class="btn btn-primary" type="submit" style="width: 100%; margin-top: 1.5rem;">
+          Post Need Board
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js?v=2"></script>
 </body>
 </html>

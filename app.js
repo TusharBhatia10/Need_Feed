@@ -212,6 +212,20 @@ function saveDatabase() {
   // Do not persist to localStorage so that refresh resets state
 }
 
+function getWeightOrVolume(need) {
+  if (need.weightOrVolume) return need.weightOrVolume;
+  const name = need.name;
+  const match = name.match(/(\d+(?:\.\d+)?\s*(?:kg|l|ml|g|pcs|pack|combo|board))/i);
+  if (match) {
+    return match[1];
+  }
+  if (name.toLowerCase().includes("atta")) return "10kg";
+  if (name.toLowerCase().includes("milk") || name.toLowerCase().includes("oil")) return "1L";
+  if (name.toLowerCase().includes("dal") || name.toLowerCase().includes("rice")) return "1kg";
+  if (name.toLowerCase().includes("meal") || name.toLowerCase().includes("combo")) return "1 Combo";
+  return "1 Unit";
+}
+
 // Initialize on execution
 initDatabase();
 
@@ -225,13 +239,24 @@ let activeCheckoutNeed = null;
 let currentTrackingOrder = null;
 let activeCauseFilter = "all";
 let activeDetailsOrderId = null;
+let currentWorkflowLogs = null;
 
 // ==========================================
 // Swiggy MCP Logger Engine
 // ==========================================
 
 function logToConsole(type, label, data) {
-  const consoleOutput = document.getElementById("console-output");
+  const consoleOutput = document.getElementById("mcp-terminal-console");
+  
+  if (currentWorkflowLogs) {
+    currentWorkflowLogs.push({
+      time: new Date().toLocaleTimeString(),
+      type: type,
+      label: label,
+      data: data ? JSON.parse(JSON.stringify(data)) : null
+    });
+  }
+
   if (!consoleOutput) return;
 
   const entry = document.createElement("div");
@@ -268,8 +293,10 @@ function logToConsole(type, label, data) {
 }
 
 function clearConsole() {
-  const consoleOutput = document.getElementById("console-output");
-  if (consoleOutput) consoleOutput.innerHTML = "";
+  const consoleOutput = document.getElementById("mcp-terminal-console");
+  if (consoleOutput) {
+    consoleOutput.innerHTML = `<div class="log-line">--- Swiggy Model Context Protocol (MCP) Terminal Connected ---</div>`;
+  }
   logToConsole("info", "Swiggy MCP Console Ready. Initiating session...", null);
 }
 
@@ -445,6 +472,7 @@ async function simulateMcpCall(server, toolName, args) {
 // ==========================================
 
 async function triggerSwiggyMcpOrderWorkflow(need, quantity, donorName) {
+  currentWorkflowLogs = [];
   const isFood = need.type === "food";
   const server = isFood ? "food" : "instamart";
   const shelter = SHELTERS_DB.find(s => s.needs.some(n => n.id === need.id));
@@ -530,19 +558,24 @@ async function triggerSwiggyMcpOrderWorkflow(need, quantity, donorName) {
     itemName: need.name,
     category: need.category,
     quantity: quantity,
+    unitsToSupply: quantity,
     amount: need.price * quantity,
     swiggyOrderId: orderConfirmation.orderId,
     status: "placed",
     type: need.type,
     deliveryProgress: 15,
     eta: orderConfirmation.etaMinutes,
-    date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+    date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+    mcpAuditTrail: currentWorkflowLogs
   };
+
+  currentWorkflowLogs = null;
 
   PLEDGES_QUEUE.unshift(newOrder);
 
   // Update original needs tally (mock update database)
   need.pledged += quantity;
+  need.delivered += quantity;
   saveDatabase();
 
   // Refresh UI dashboards
@@ -579,15 +612,12 @@ function runDeliverySimulation(order) {
 
     if (progress >= 100) {
       clearInterval(timerId);
+      if (window.deliveryTimers) {
+        delete window.deliveryTimers[order.id];
+      }
       order.status = "delivered";
       order.deliveryProgress = 100;
       
-      // Update shelter database: confirm delivery received
-      const shelter = SHELTERS_DB.find(s => s.id === order.shelterId);
-      const need = shelter.needs.find(n => n.name === order.itemName);
-      if (need) {
-        need.delivered = Math.min(need.quantity, need.delivered + order.quantity);
-      }
       saveDatabase();
       
       logToConsole("info", `DELIVERED! Swiggy partner completed drop-off at shelter doorstep. Order ID: ${order.swiggyOrderId}`, null);
@@ -604,7 +634,10 @@ function runDeliverySimulation(order) {
     if (activeDetailsOrderId === order.id) {
       openDonationDetailsModal(order.id);
     }
-  }, 10000); // Progress updates every 10 seconds (as recommended by docs to prevent rate limit)
+  }, 10000); // Progress updates every 10 seconds
+
+  window.deliveryTimers = window.deliveryTimers || {};
+  window.deliveryTimers[order.id] = timerId;
 }
 
 // ==========================================
@@ -639,10 +672,10 @@ function renderShelters() {
             <a href="${shelter.website || '#'}" target="_blank" class="info-search-btn" title="Visit Official Website">i</a>
           </h3>
           <div class="shelter-location">
-            <span>📍</span> ${shelter.city}
+            Location: ${shelter.city}
           </div>
           <div class="shelter-residents" style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem; display: flex; align-items: center; gap: 0.25rem;">
-            <span>👥</span> ${shelter.residents} ${shelter.resident_label || "Residents"}
+            Residents: ${shelter.residents} ${shelter.resident_label || "Residents"}
           </div>
           <p class="shelter-desc" style="margin-top: 0.5rem;">${shelter.description}</p>
           <div class="needs-summary">
@@ -654,7 +687,7 @@ function renderShelters() {
           </div>
           <div class="shelter-card-footer">
             <button class="btn btn-primary" onclick="openNeedsDrawer('${shelter.id}')">
-              <span>💝</span> Support Shelter
+              Support Shelter
             </button>
           </div>
         </div>
@@ -695,17 +728,17 @@ function openNeedsDrawer(shelterId) {
         </div>
         
         <div class="progress-label">
-          <span>Pledged: <strong class="progress-pct">${need.pledged}</strong> / ${need.quantity} units</span>
+          <span><strong class="progress-pct">${unmet}</strong> units to be supplied</span>
           <span class="progress-pct">${progress}%</span>
         </div>
 
         ${unmet > 0 ? `
           <button class="btn sponsor-btn" onclick="openCheckoutModal('${need.id}')">
-            🤝 Sponsor ${isSpecial ? 'Meal' : 'Supply'}
+            Sponsor ${isSpecial ? 'Meal' : 'Supply'}
           </button>
         ` : `
           <button class="btn btn-secondary" style="margin-top: 1rem; cursor: not-allowed;" disabled>
-            ✅ Needs Fulfilled
+            Needs Fulfilled
           </button>
         `}
       </div>
@@ -717,6 +750,11 @@ function openNeedsDrawer(shelterId) {
 }
 
 function closeNeedsDrawer() {
+  const drawer = document.getElementById("needs-drawer");
+  if (drawer) drawer.classList.remove("expanded");
+  const expandBtn = document.querySelector(".drawer-expand-btn");
+  if (expandBtn) expandBtn.innerText = "Expand Window";
+
   document.getElementById("needs-drawer").classList.remove("open");
   document.getElementById("checkout-modal").classList.remove("open");
   const detailsModal = document.getElementById("donation-details-modal");
@@ -741,6 +779,28 @@ function openCheckoutModal(needId) {
   document.getElementById("checkout-qty").value = 1;
   document.getElementById("checkout-qty").max = remaining;
 
+  // Prefill Owner Name and set label
+  const donorLabel = document.querySelector('label[for="donor-name-input"]');
+  if (donorLabel) donorLabel.innerText = "Owner Name";
+  
+  const donorInput = document.getElementById("donor-name-input");
+  if (donorInput) donorInput.value = "Tushar Bhatia";
+
+  // Prefill Quantity label based on item unit
+  const qtyLabel = document.querySelector('label[for="checkout-qty"]');
+  if (qtyLabel) {
+    const nameLower = need.name.toLowerCase();
+    if (nameLower.includes("atta") || nameLower.includes("dal") || nameLower.includes("rice")) {
+      qtyLabel.innerText = "Weight to Sponsor (kg)";
+    } else if (nameLower.includes("milk") || nameLower.includes("oil")) {
+      qtyLabel.innerText = "Volume to Sponsor (Litres)";
+    } else if (need.isSpecialMeal) {
+      qtyLabel.innerText = "Quantity to Sponsor (meals)";
+    } else {
+      qtyLabel.innerText = "Quantity to Sponsor (units)";
+    }
+  }
+
   calculateCheckoutBill();
 
   // Reset standard screens
@@ -760,9 +820,42 @@ function closeCheckoutModal() {
 }
 
 function calculateCheckoutBill() {
-  const qty = parseInt(document.getElementById("checkout-qty").value) || 1;
+  const qtyInput = document.getElementById("checkout-qty");
+  const qty = parseInt(qtyInput.value) || 1;
   const unitPrice = activeCheckoutNeed.price;
+  const remaining = activeCheckoutNeed.quantity - activeCheckoutNeed.pledged;
   
+  const payBtn = document.getElementById("checkout-pay-btn");
+  
+  let warningDiv = document.getElementById("checkout-qty-warning");
+  if (!warningDiv) {
+    warningDiv = document.createElement("div");
+    warningDiv.id = "checkout-qty-warning";
+    warningDiv.style.color = "var(--primary)"; // theme primary orange alert
+    warningDiv.style.fontSize = "0.75rem";
+    warningDiv.style.marginTop = "0.25rem";
+    warningDiv.style.fontWeight = "600";
+    qtyInput.parentNode.appendChild(warningDiv);
+  }
+
+  if (qty > remaining) {
+    warningDiv.innerText = `Only ${remaining} unit${remaining === 1 ? '' : 's'} are needed.`;
+    qtyInput.style.borderColor = "var(--primary)";
+    if (payBtn) {
+      payBtn.disabled = true;
+      payBtn.style.opacity = "0.5";
+      payBtn.innerText = "Quantity exceeds needs";
+    }
+  } else {
+    warningDiv.innerText = "";
+    qtyInput.style.borderColor = "var(--border)";
+    if (payBtn) {
+      payBtn.disabled = false;
+      payBtn.style.opacity = "1";
+      payBtn.innerText = "Pay & Sponsor";
+    }
+  }
+
   const subtotal = unitPrice * qty;
   const delivery = 39; // standard Instamart fee
   const tax = Math.round(subtotal * 0.05);
@@ -778,6 +871,16 @@ async function handlePaymentSubmit() {
   const donorName = document.getElementById("donor-name-input").value.trim() || "Anonymous Donor";
   const qty = parseInt(document.getElementById("checkout-qty").value) || 1;
   
+  const remaining = activeCheckoutNeed.quantity - activeCheckoutNeed.pledged;
+  if (qty > remaining) {
+    alert(`Only ${remaining} unit${remaining === 1 ? '' : 's'} are needed.`);
+    return;
+  }
+  if (qty <= 0) {
+    alert("Quantity must be at least 1.");
+    return;
+  }
+
   // Hide form view, display loading state inside payment button
   const payBtn = document.getElementById("checkout-pay-btn");
   payBtn.disabled = true;
@@ -792,10 +895,14 @@ async function handlePaymentSubmit() {
   const successScreen = document.getElementById("checkout-success-screen");
   successScreen.style.display = "block";
   
-  // Fire background Swiggy MCP transaction pipeline
+  // Close the checkout modal and supplies drawer
   closeNeedsDrawer();
   
-  // Fire automated task
+  // Clear console and switch to MCP Flow view to reflect the protocol transaction live
+  clearConsole();
+  switchView('mcp');
+  
+  // Fire automated task (logs will print live in the active terminal)
   const newOrder = await triggerSwiggyMcpOrderWorkflow(activeCheckoutNeed, qty, donorName);
 
   // Update success screen with live order details
@@ -826,7 +933,8 @@ function renderAdminPanel() {
   // Render Shelter Needs
   activeNeedsGrid.innerHTML = selectedShelter.needs.map(need => {
     const isSpecial = need.isSpecialMeal;
-    const progress = Math.round((need.pledged / need.quantity) * 100);
+    const weightVal = getWeightOrVolume(need);
+    const progress = Math.min(100, Math.round((need.delivered / need.quantity) * 100));
 
     return `
       <div class="need-list-item" style="margin-bottom: 0.75rem;">
@@ -836,8 +944,11 @@ function renderAdminPanel() {
             ${isSpecial ? 'Special Meal' : need.category}
           </span>
         </div>
+        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">
+          Weight / Size: ${weightVal} | Quantity: ${need.quantity}
+        </div>
         <div class="progress-label" style="font-size: 0.75rem;">
-          <span>Goal: ${need.quantity} | Pledged: ${need.pledged} | Delivered: <strong style="color: #10B981;">${need.delivered}</strong></span>
+          <span>Requested: ${need.quantity} | Delivered: <strong style="color: #10B981;">${need.delivered}</strong></span>
           <span>${progress}%</span>
         </div>
         <div class="progress-bar-container" style="height: 6px; margin: 0.35rem 0 0;">
@@ -868,12 +979,12 @@ function renderAdminPanel() {
       mapHtml = `
         <div class="map-simulator">
           <div class="map-road"></div>
-          <div class="map-marker shop">🏪</div>
+          <div class="map-marker shop"><div class="hub-marker">Hub</div></div>
           <div class="map-label shop">Swiggy Hub</div>
           
-          <div class="map-bike" style="left: ${bikeOffset}%">🛵</div>
+          <div class="map-bike" style="left: ${bikeOffset}%"><div class="bike-marker">Courier</div></div>
           
-          <div class="map-marker shelter">🏡</div>
+          <div class="map-marker shelter"><div class="shelter-marker">Shelter</div></div>
           <div class="map-label shelter">${selectedShelter.name.split(' ')[0]}</div>
           
           <div style="position: absolute; bottom: 0.5rem; left: 1rem; font-size: 0.75rem; color: var(--text-secondary);">
@@ -1103,6 +1214,8 @@ function handleAddNeedSubmit(event) {
   catSelect.value = "GROCERY";
   handleCategoryChange();
 
+  closeAddNeedModal();
+
   renderShelters();
   renderAdminPanel();
 }
@@ -1144,9 +1257,11 @@ function switchView(view) {
   // Toggle active views
   document.getElementById("view-btn-donor").classList.toggle("active", view === "donor");
   document.getElementById("view-btn-admin").classList.toggle("active", view === "admin");
+  document.getElementById("view-btn-mcp").classList.toggle("active", view === "mcp");
   
   document.getElementById("view-donor").classList.toggle("active", view === "donor");
   document.getElementById("view-admin").classList.toggle("active", view === "admin");
+  document.getElementById("view-mcp").classList.toggle("active", view === "mcp");
 
   if (view === "admin") {
     // Populate admin sidebar select
@@ -1165,7 +1280,7 @@ function switchView(view) {
     }
 
     renderAdminPanel();
-  } else {
+  } else if (view === "donor") {
     renderShelters();
     renderDonationHistory();
   }
@@ -1202,21 +1317,22 @@ function renderDonationHistory() {
   historyList.innerHTML = userPledges.map(order => {
     const shelter = SHELTERS_DB.find(s => s.id === order.shelterId) || { name: "Verified Shelter", city: "Mumbai" };
     
-    // Choose emoji based on category or name
-    let emoji = "💝";
+    // Choose category initial letter and class based on category or name
+    let catLetter = "D";
+    let catClass = "donation";
     const cat = (order.category || "").toUpperCase();
-    if (cat.includes("GROCERY")) emoji = "🌾";
-    else if (cat.includes("TOILETRIES")) emoji = "🧼";
-    else if (cat.includes("MEDICINE")) emoji = "💊";
-    else if (cat.includes("PERSONAL")) emoji = "🪥";
-    else if (cat.includes("ENTERTAINMENT")) emoji = "🎮";
-    else if (cat.includes("SPECIAL")) emoji = "🍲";
+    if (cat.includes("GROCERY")) { catLetter = "G"; catClass = "grocery"; }
+    else if (cat.includes("TOILETRIES")) { catLetter = "T"; catClass = "toiletries"; }
+    else if (cat.includes("MEDICINE")) { catLetter = "M"; catClass = "medicine"; }
+    else if (cat.includes("PERSONAL")) { catLetter = "P"; catClass = "personal"; }
+    else if (cat.includes("ENTERTAINMENT")) { catLetter = "E"; catClass = "entertainment"; }
+    else if (cat.includes("SPECIAL")) { catLetter = "S"; catClass = "special"; }
 
     const statusLabel = order.status.replace('_', ' ');
 
     return `
       <div class="history-item" onclick="openDonationDetailsModal('${order.id}')" data-order-id="${order.id}">
-        <div class="history-icon">${emoji}</div>
+        <div class="history-icon category-icon-${catClass}">${catLetter}</div>
         <div class="history-details">
           <h4>${order.itemName}</h4>
           <p>${shelter.name}</p>
@@ -1247,25 +1363,30 @@ function openDonationDetailsModal(orderId) {
   const body = document.getElementById("details-modal-body");
   if (!modal || !body) return;
 
-  let statusEmoji = "📦";
   let statusColor = "var(--primary)";
   let statusDesc = "";
   if (order.status === "delivered") {
-    statusEmoji = "✅";
     statusColor = "#10B981";
     statusDesc = "Delivered to the shelter doorstep.";
   } else if (order.status === "in_transit") {
-    statusEmoji = "🛵";
     statusColor = "#06B6D4";
     statusDesc = `In Transit. Delivery partner is on the way (ETA: ~${order.eta || 10} mins).`;
+  } else if (order.status === "cancelled") {
+    statusColor = "#ef4444";
+    statusDesc = "This order was cancelled. Pledge resources reverted.";
   } else {
-    statusEmoji = "📦";
     statusColor = "#3B82F6";
     statusDesc = "Order placed successfully. Waiting for dispatch.";
   }
 
   let progressHtml = "";
-  if (order.status !== "delivered") {
+  if (order.status === "cancelled") {
+    progressHtml = `
+      <div style="margin-top: 1rem; background: rgba(239, 68, 68, 0.05); border: 1px dashed #ef4444; border-radius: var(--radius-sm); padding: 0.75rem; color: #ef4444; font-size: 0.8rem; font-weight: 600; text-align: center;">
+        Order Cancelled & Pledge Reverted
+      </div>
+    `;
+  } else if (order.status !== "delivered") {
     const progress = order.deliveryProgress || 15;
     progressHtml = `
       <div style="margin-top: 1rem;">
@@ -1276,15 +1397,16 @@ function openDonationDetailsModal(orderId) {
         <div class="progress-bar-container" style="height: 8px; border-radius: 4px; overflow: hidden; background: var(--border);">
           <div class="progress-bar" style="width: ${progress}%; background: var(--secondary); height: 100%; transition: width 0.3s ease;"></div>
         </div>
-        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.4rem; display: flex; align-items: center; gap: 0.25rem;">
-          <span>🛵</span> Live delivery partner: <strong>Ramesh (98888)</strong>
+        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.4rem; display: flex; align-items: center; gap: 0.25rem; justify-content: space-between;">
+          <span>Live delivery partner: <strong>Ramesh (98888)</strong></span>
+          <button class="btn" onclick="cancelOrder('${order.id}')" style="background: #ef4444; color: white; font-size: 0.65rem; padding: 0.2rem 0.5rem; width: auto; font-weight: 700; border-radius: 4px; display: inline-flex;">Cancel Order</button>
         </div>
       </div>
     `;
   } else {
     progressHtml = `
       <div style="margin-top: 1rem; background: rgba(16, 185, 129, 0.05); border: 1px dashed #10B981; border-radius: var(--radius-sm); padding: 0.75rem; display: flex; align-items: center; gap: 0.5rem; color: #10B981; font-size: 0.8rem;">
-        <span>🎉</span> <strong>Delivery Completed!</strong> Handed over to ${shelter.name} representative.
+        <strong>Delivery Completed!</strong> Handed over to ${shelter.name} representative.
       </div>
     `;
   }
@@ -1294,12 +1416,49 @@ function openDonationDetailsModal(orderId) {
   const subtotal = Math.max(0, Math.round((order.amount - deliveryFee) / 1.05));
   const taxes = order.amount - subtotal - deliveryFee;
 
+  let auditTrailHtml = "";
+  if (order.mcpAuditTrail && order.mcpAuditTrail.length > 0) {
+    const logLinesHtml = order.mcpAuditTrail.map(log => {
+      let cssClass = "";
+      let label = "";
+      if (log.type === "rpc-req") {
+        cssClass = "log-agent";
+        label = `--> JSON-RPC Request (${log.label})`;
+      } else if (log.type === "rpc-res") {
+        cssClass = "log-mcp";
+        label = `<-- JSON-RPC Response (${log.label})`;
+      } else {
+        cssClass = "log-line";
+        label = `[SYSTEM INFO] ${log.label}`;
+      }
+      
+      const preHtml = log.data ? `<pre class="log-json" style="font-size: 0.7rem; padding: 0.35rem; margin: 0.15rem 0; background: rgba(255, 255, 255, 0.05); color: #cbd5e1; font-family: var(--font-mono);">${JSON.stringify(log.data, null, 2)}</pre>` : "";
+      return `
+        <div class="log-line" style="margin-bottom: 0.5rem; line-height: 1.3;">
+          <span class="console-timestamp" style="font-size: 0.7rem; opacity: 0.6; color: #64748b;">[${log.time}]</span> 
+          <span class="${cssClass}" style="font-size: 0.75rem;">${label}</span>
+          ${preHtml}
+        </div>`;
+    }).join('');
+
+    auditTrailHtml = `
+      <div style="border-top: 1px solid var(--border); padding-top: 0.75rem; margin-top: 0.5rem;">
+        <h4 style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 0.35rem; font-weight: 600;">MCP Protocol Audit Trail</h4>
+        <details style="border: 1px solid var(--border); border-radius: 6px; padding: 0.5rem; background: var(--surface);">
+          <summary style="font-size: 0.8rem; font-weight: 700; cursor: pointer; color: var(--primary);">View JSON-RPC Protocol Logs</summary>
+          <div class="mcp-terminal" style="font-family: var(--font-mono); font-size: 0.75rem; margin-top: 0.5rem; max-height: 220px; overflow-y: auto; background: #0f172a; padding: 0.75rem; border-radius: 4px; display: flex; flex-direction: column; gap: 0.5rem; border: 1px solid #334155;">
+            ${logLinesHtml}
+          </div>
+        </details>
+      </div>
+    `;
+  }
+
   body.innerHTML = `
     <div style="padding: 1rem; display: flex; flex-direction: column; gap: 1rem;">
       
       <!-- Status Card -->
       <div style="display: flex; align-items: center; gap: 0.75rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.85rem;">
-        <div style="font-size: 1.8rem;">${statusEmoji}</div>
         <div>
           <div style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: ${statusColor};">
             ${order.status.replace('_', ' ')}
@@ -1331,7 +1490,7 @@ function openDonationDetailsModal(orderId) {
             <a href="${shelter.website || '#'}" target="_blank" style="font-size: 0.75rem; color: var(--primary); text-decoration: underline;">Website ↗</a>
           </div>
           <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem; line-height: 1.35;">
-            📍 ${shelter.address || shelter.city}
+            Address: ${shelter.address || shelter.city}
           </div>
         </div>
       </div>
@@ -1368,6 +1527,9 @@ function openDonationDetailsModal(orderId) {
 
       <!-- Live Progress -->
       ${progressHtml}
+
+      <!-- MCP Audit Trail -->
+      ${auditTrailHtml}
 
     </div>
   `;
@@ -1441,9 +1603,43 @@ function toggleSidebar() {
   }
 }
 
-// Global bootstrap loader
+function toggleTheme() {
+  document.documentElement.classList.toggle("dark-mode");
+  const isDark = document.body.classList.toggle("dark-mode");
+  const icon = document.querySelector(".theme-icon");
+  const btn = document.getElementById("theme-toggle-btn");
+  
+  if (isDark) {
+    if (icon) icon.innerText = "☀";
+    if (btn) btn.title = "Switch to Light Mode";
+    localStorage.setItem("nf_theme", "dark");
+  } else {
+    if (icon) icon.innerText = "☾";
+    if (btn) btn.title = "Switch to Dark Mode";
+    localStorage.setItem("nf_theme", "light");
+  }
+}
+
 window.addEventListener("DOMContentLoaded", () => {
   clearConsole();
+  
+  // Load theme preference on boot
+  const savedTheme = localStorage.getItem("nf_theme");
+  if (savedTheme === "dark") {
+    document.documentElement.classList.add("dark-mode");
+    document.body.classList.add("dark-mode");
+    const icon = document.querySelector(".theme-icon");
+    if (icon) icon.innerText = "☀";
+    const btn = document.getElementById("theme-toggle-btn");
+    if (btn) btn.title = "Switch to Light Mode";
+  }
+
+  // Set up theme toggle listener
+  const themeBtn = document.getElementById("theme-toggle-btn");
+  if (themeBtn) {
+    themeBtn.addEventListener("click", toggleTheme);
+  }
+
   renderShelters();
   renderDonationHistory();
   
@@ -1471,11 +1667,6 @@ window.addEventListener("DOMContentLoaded", () => {
           order.status = "delivered";
           order.deliveryProgress = 100;
           
-          const shelter = SHELTERS_DB.find(s => s.id === order.shelterId);
-          const need = shelter.needs.find(n => n.name === order.itemName);
-          if (need) {
-            need.delivered = Math.min(need.quantity, need.delivered + order.quantity);
-          }
           saveDatabase();
           logToConsole("info", `DELIVERED! Mock order ${order.swiggyOrderId} successfully completed.`, null);
           renderShelters();
@@ -1495,6 +1686,286 @@ window.addEventListener("DOMContentLoaded", () => {
   }, 12000);
 });
 
+function openAddNeedModal() {
+  const modal = document.getElementById("admin-add-need-modal");
+  const overlay = document.getElementById("drawer-overlay");
+  if (modal && overlay) {
+    modal.classList.add("open");
+    overlay.classList.add("open");
+  }
+}
+
+function closeAddNeedModal() {
+  const modal = document.getElementById("admin-add-need-modal");
+  const overlay = document.getElementById("drawer-overlay");
+  if (modal && overlay) {
+    modal.classList.remove("open");
+    overlay.classList.remove("open");
+  }
+}
+
+function toggleExpandNeedsDrawer() {
+  const drawer = document.getElementById("needs-drawer");
+  if (drawer) {
+    const isExpanded = drawer.classList.toggle("expanded");
+    const btn = document.querySelector(".drawer-expand-btn");
+    if (btn) {
+      btn.innerText = isExpanded ? "Collapse Window" : "Expand Window";
+    }
+  }
+}
+
+function setMcpPrompt(text) {
+  const input = document.getElementById("mcp-prompt-input");
+  if (input) input.value = text;
+}
+
+function clearMcpTerminal() {
+  const terminal = document.getElementById("mcp-terminal-console");
+  if (terminal) {
+    terminal.innerHTML = `<div class="log-line">--- Swiggy Model Context Protocol (MCP) Terminal Connected ---</div>`;
+  }
+}
+
+let mcpSimTimeout = null;
+function runMcpSimulation() {
+  const input = document.getElementById("mcp-prompt-input");
+  const terminal = document.getElementById("mcp-terminal-console");
+  if (!input || !terminal) return;
+
+  const prompt = input.value.trim() || "Sponsor Atta to Banyan Tree Care Facility";
+  
+  if (mcpSimTimeout) {
+    clearTimeout(mcpSimTimeout);
+  }
+  
+  terminal.innerHTML = `<div class="log-line">--- Swiggy Model Context Protocol (MCP) Terminal Connected ---</div>`;
+  
+  let shelterName = "The Banyan Tree Geriatric Care";
+  let shelterAddrId = "addr_aasha_99";
+  let itemName = "Aashirvaad Shudh Chakki Atta 10kg";
+  let sku = "sku_atta_10k";
+  let unitPrice = 460;
+  let qty = 5;
+
+  const pLower = prompt.toLowerCase();
+  if (pLower.includes("manav") || pLower.includes("shah") || pLower.includes("sion")) {
+    shelterName = "C.U. Shah Senior Citizens Home";
+    shelterAddrId = "addr_kalyan_88";
+  } else if (pLower.includes("adharwad") || pLower.includes("seawoods")) {
+    shelterName = "Adharwad Old Age Home";
+    shelterAddrId = "addr_paws_77";
+  } else if (pLower.includes("dhanwantari") || pLower.includes("thane")) {
+    shelterName = "Dhanwantari Old Age Home";
+    shelterAddrId = "addr_dhanwantari_66";
+  }
+
+  if (pLower.includes("milk")) {
+    itemName = "Amul Taaza Fresh Milk 1L Pack";
+    sku = "sku_milk_1l";
+    unitPrice = 74;
+    qty = 15;
+  } else if (pLower.includes("oil")) {
+    itemName = "Fortune Mustard Oil 1L";
+    sku = "sku_oil_1l";
+    unitPrice = 175;
+    qty = 10;
+  } else if (pLower.includes("paneer") || pLower.includes("combo") || pLower.includes("meal")) {
+    itemName = "Paneer Butter Masala & Garlic Naan Combo";
+    sku = "sku_paneer_combo";
+    unitPrice = 340;
+    qty = 12;
+  }
+
+  const logs = [
+    { text: `[Agent] Initializing reasoning loop...`, type: "agent" },
+    { text: `[Agent] User intent: "${prompt}"`, type: "agent" },
+    { text: `[Agent] Matching intent to Swiggy Instamart catalog...`, type: "agent" },
+    { text: `[Agent] Call tool: "swiggy_search_catalog"`, type: "agent" },
+    { text: JSON.stringify({
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "swiggy_search_catalog",
+          "arguments": {
+            "query": itemName.split(' ')[0],
+            "store_type": itemName.toLowerCase().includes("combo") ? "food" : "instamart"
+          }
+        },
+        "id": 1
+      }, null, 2), type: "json" },
+    { text: `[MCP Server] Response: Found matching item in catalog.`, type: "mcp" },
+    { text: JSON.stringify({
+        "jsonrpc": "2.0",
+        "result": {
+          "items": [
+            {
+              "sku": sku,
+              "name": itemName,
+              "price": unitPrice,
+              "in_stock": true
+            }
+          ]
+        },
+        "id": 1
+      }, null, 2), type: "json" },
+    { text: `[Agent] Formulating cart list. Item: "${itemName}" | Quantity: ${qty}`, type: "agent" },
+    { text: `[Agent] Call tool: "swiggy_add_to_cart"`, type: "agent" },
+    { text: JSON.stringify({
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "swiggy_add_to_cart",
+          "arguments": {
+            "sku": sku,
+            "quantity": qty
+          }
+        },
+        "id": 2
+      }, null, 2), type: "json" },
+    { text: `[MCP Server] Response: Cart updated successfully.`, type: "mcp" },
+    { text: JSON.stringify({
+        "jsonrpc": "2.0",
+        "result": {
+          "status": "success",
+          "cart_id": "cart_swiggy_993",
+          "total_items": qty,
+          "subtotal": unitPrice * qty
+        },
+        "id": 2
+      }, null, 2), type: "json" },
+    { text: `[Agent] Resolving destination delivery address ID...`, type: "agent" },
+    { text: `[Agent] Call tool: "swiggy_get_address_id"`, type: "agent" },
+    { text: JSON.stringify({
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "swiggy_get_address_id",
+          "arguments": {
+            "shelter_name": shelterName
+          }
+        },
+        "id": 3
+      }, null, 2), type: "json" },
+    { text: `[MCP Server] Response: Target address verified.`, type: "mcp" },
+    { text: JSON.stringify({
+        "jsonrpc": "2.0",
+        "result": {
+          "address_id": shelterAddrId,
+          "formatted_address": "Verified Delivery Point, Mumbai"
+        },
+        "id": 3
+      }, null, 2), type: "json" },
+    { text: `[Agent] Constructing checkout session and calculating bill...`, type: "agent" },
+    { text: `[Agent] Call tool: "swiggy_place_order"`, type: "agent" },
+    { text: JSON.stringify({
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "swiggy_place_order",
+          "arguments": {
+            "cart_id": "cart_swiggy_993",
+            "address_id": shelterAddrId,
+            "payment_method": "donation_credit"
+          }
+        },
+        "id": 4
+      }, null, 2), type: "json" },
+    { text: `[MCP Server] Response: Order successfully placed! dispatching courier.`, type: "mcp" },
+    { text: JSON.stringify({
+        "jsonrpc": "2.0",
+        "result": {
+          "order_id": `SWIGGY-${Math.floor(Math.random()*90000)+10000}-IM`,
+          "status": "placed",
+          "eta": 15,
+          "delivery_partner": "Ramesh (98888)"
+        },
+        "id": 4
+      }, null, 2), type: "json" },
+    { text: `[Agent] Success! Swiggy order created. Tracking dispatch status to "${shelterName}".`, type: "agent" }
+  ];
+
+  let currentLogIdx = 0;
+  function printNextLine() {
+    if (currentLogIdx >= logs.length) return;
+    const log = logs[currentLogIdx];
+    
+    let html = '';
+    if (log.type === "agent") {
+      html = `<div class="log-line log-agent">${log.text}</div>`;
+    } else if (log.type === "mcp") {
+      html = `<div class="log-line log-mcp">${log.text}</div>`;
+    } else {
+      html = `<pre class="log-json">${log.text}</pre>`;
+    }
+    
+    terminal.innerHTML += html;
+    terminal.scrollTop = terminal.scrollHeight;
+    
+    currentLogIdx++;
+    mcpSimTimeout = setTimeout(printNextLine, 600);
+  }
+
+  printNextLine();
+}
+
+function cancelOrder(orderId) {
+  const order = PLEDGES_QUEUE.find(o => o.id === orderId);
+  if (!order) return;
+
+  if (order.status === "cancelled") {
+    alert("This order is already cancelled.");
+    return;
+  }
+
+  if (!confirm("Are you sure you want to cancel this order?")) {
+    return;
+  }
+
+  const shelter = SHELTERS_DB.find(s => s.id === order.shelterId);
+  if (shelter) {
+    const need = shelter.needs.find(n => n.name === order.itemName);
+    if (need) {
+      const units = order.unitsToSupply || order.quantity || 0;
+      need.pledged = Math.max(0, need.pledged - units);
+      need.delivered = Math.max(0, need.delivered - units);
+    }
+  }
+
+  order.status = "cancelled";
+  order.deliveryProgress = 0;
+  
+  if (window.deliveryTimers && window.deliveryTimers[order.id]) {
+    clearInterval(window.deliveryTimers[order.id]);
+    delete window.deliveryTimers[order.id];
+  }
+
+  saveDatabase();
+
+  renderShelters();
+  renderDonationHistory();
+  if (activeView === "admin") {
+    renderAdminPanel();
+  }
+
+  if (activeDetailsOrderId === order.id) {
+    openDonationDetailsModal(order.id);
+  }
+}
+
+function downloadMcpLogs(orderId) {
+  const order = PLEDGES_QUEUE.find(o => o.id === orderId);
+  if (!order || !order.mcpAuditTrail) return;
+
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(order.mcpAuditTrail, null, 2));
+  const downloadAnchor = document.createElement('a');
+  downloadAnchor.setAttribute("href", dataStr);
+  downloadAnchor.setAttribute("download", `mcp-audit-${order.swiggyOrderId}.json`);
+  document.body.appendChild(downloadAnchor);
+  downloadAnchor.click();
+  downloadAnchor.remove();
+}
+
 // Export handlers to window for ESM / Vite compatibility
 window.switchView = switchView;
 window.clearConsole = clearConsole;
@@ -1513,3 +1984,12 @@ window.goToDonationHistory = goToDonationHistory;
 window.openDonationDetailsModal = openDonationDetailsModal;
 window.closeDonationDetailsModal = closeDonationDetailsModal;
 window.toggleSidebar = toggleSidebar;
+window.toggleTheme = toggleTheme;
+window.openAddNeedModal = openAddNeedModal;
+window.closeAddNeedModal = closeAddNeedModal;
+window.toggleExpandNeedsDrawer = toggleExpandNeedsDrawer;
+window.runMcpSimulation = runMcpSimulation;
+window.clearMcpTerminal = clearMcpTerminal;
+window.setMcpPrompt = setMcpPrompt;
+window.downloadMcpLogs = downloadMcpLogs;
+window.cancelOrder = cancelOrder;

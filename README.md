@@ -6,34 +6,39 @@ Built using modern vanilla HTML, CSS, and JavaScript, Need Feed simulates a live
 
 ---
 
-## 🌟 Key Features
+## Key Features
 
-### 1. Verified Cause Categories & Filters
-Browse shelters and organizations dynamically filtered by category tabs:
-- **👵 Eldercare**: Scraped real registered facilities in Mumbai (The Banyan Tree Geriatric Care, C.U. Shah Senior Citizens Home, Adharwad Old Age Home, and Dhanwantari Old Age Home).
-- **👶 Child Welfare**: Orphanages and support shelters (Bal Asha Trust, Aasara Bombay).
-- **🐾 Animal Welfare**: Stray shelters and animal hospitals (Bombay SPCA & Animal Hospital, Animal Matters To Me).
+### 1. Swiggy MCP Flow & JSON-RPC Simulator
+- **MCP Playground**: Interactive terminal and flowchart console representing how AI agents communicate with Swiggy catalog, cart, and checkout tool endpoints using the Model Context Protocol.
+- **Real-Time Logs**: Features a dark developer console logging JSON-RPC request-response transactions step-by-step.
 
-### 2. LHS Collapsible Supporter Sidebar
-- **Supporter Profile**: Focuses on a single-user interactive session (preset to **Tushar Bhatia**).
-- **Collapsible Design**: A collapsible side panel that collapses from `340px` down to a compact `80px` layout (with standard grid adjustments) for maximized screen real estate.
+### 2. Verified Cause Categories & Filters
+Browse shelters and organizations dynamically filtered by category tabs (completely emoji-free):
+- **Eldercare**: Scraped real registered facilities in Mumbai (The Banyan Tree Geriatric Care, C.U. Shah Senior Citizens Home, Adharwad Old Age Home, and Dhanwantari Old Age Home).
+- **Child Welfare**: Orphanages and support shelters (Bal Asha Trust, Aasara Bombay).
+- **Animal Welfare**: Stray shelters and animal hospitals (Bombay SPCA & Animal Hospital, Animal Matters To Me).
+
+### 3. LHS Collapsible Supporter Sidebar
+- **Supporter Profile**: Focuses on a single-user interactive session (preset to Tushar Bhatia).
+- **Collapsible Design**: A collapsible side panel that collapses from 340px down to a compact 80px layout for maximized screen real estate.
 - **Supporter Statistics**: Real-time counters showing total donated value and pledge count, which automatically increment as donations are processed.
 
-### 3. Dynamic Donation History & Detail Modal
+### 4. Dynamic Donation History & Detail Modal
 - **Dynamic Startup State**: The donation history list begins completely empty on page load.
 - **Detailed Modal Dialogs**: Clicking on any logged pledge opens a centered detail popup modal showing:
-  - Donated items count and unit specifications.
+  - Donated items count and unit specifications (pre-filled to Tushar Bhatia with custom weight/volume units).
   - Receipt price breakdowns (subtotal, Swiggy delivery fee, GST taxes).
   - Target beneficiary details with clickable links to their official websites.
   - A real-time delivery status tracker (Placed -> In Transit -> Delivered).
 
-### 4. Interactive Staging Checkout Simulator
-Sponsoring an item starts a checkout flow detailing delivery items, unit costs, delivery packaging fees, and taxes. Fulfilling the checkout:
-- Simulates API transactions through a virtual Swiggy MCP JSON-RPC logging terminal.
-- Dispatches a mock courier with active map simulator animations on the Shelter Admin Dashboard.
-- Updates the donor's LHS history list with visual highlights (`.flash-highlight` animation) and increments stats.
+### 5. Expandable Supplies Drawer
+- Supports a widescreen modal toggle ("Expand Window" button) to expand the supplies drawer to 90vw / 90vh layout for optimal visibility on desktop screens.
 
-### 5. Page Reload Reset
+### 6. Shelter Admin Portal
+- **Modal Need Creator**: Moves the posting form from the sidebar to an overlay modal dialog triggered by the "+ Add Need" header button.
+- **Metrics Dashboard**: Refactored Active Needs columns to show weight/size alongside quantity, track requested vs. delivered units, and update progress based on actual deliveries.
+
+### 7. Page Reload Reset
 To facilitate clean interactive demos, page reloads do not persist changes. A refresh instantly resets the database and user pledges back to standard initial seed values.
 
 ---
