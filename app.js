@@ -2,200 +2,9 @@
 // Mock Database Layer
 // ==========================================
 
-const DEFAULT_SHELTERS_DB = [
-  {
-    id: "shelter_banyan",
-    name: "The Banyan Tree Geriatric Care",
-    type: "Geriatric Care Home",
-    city: "Mulund West, Mumbai",
-    address: "Chanchal Niwas, Sai Arogya, Next to Mulund High School, Chandan Baug Road, Mulund West, Mumbai - 400080",
-    avatar: "https://images.unsplash.com/photo-1581579438747-1dc8d1e0ca96?auto=format&fit=crop&q=80&w=150",
-    cover: "https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80&w=800",
-    description: "Provides 24/7 medical supervision, geriatric nursing, dementia care, physical therapy, and post-surgical recovery for senior citizens.",
-    swiggyAddressId: "addr_aasha_99",
-    cause_type: "eldercare",
-    resident_label: "Residents",
-    residents: 50,
-    website: "https://banyantreegc.com",
-    needs: [
-      { id: "need_banyan_01", name: "Aashirvaad Shudh Chakki Atta 10kg", category: "GROCERY", quantity: 15, pledged: 9, delivered: 4, price: 460, type: "instamart", spinId: "sku_atta_10k" },
-      { id: "need_banyan_02", name: "Fortune Mustard Oil 1L", category: "GROCERY", quantity: 20, pledged: 12, delivered: 8, price: 175, type: "instamart", spinId: "sku_oil_1l" },
-      { id: "need_banyan_03", name: "Tata Sampann Toor Dal 1kg", category: "GROCERY", quantity: 30, pledged: 15, delivered: 5, price: 190, type: "instamart", spinId: "sku_dal_1k" },
-      { id: "need_banyan_04", name: "Gulab Jamun (15 pcs)", category: "SPECIAL MEAL", quantity: 3, pledged: 0, delivered: 0, price: 280, type: "food", isSpecialMeal: true, favoriteFood: "Gulab Jamun Sweet Treat", restaurantId: "rest_bikanervala" }
-    ]
-  },
-  {
-    id: "shelter_manav",
-    name: "C.U. Shah Senior Citizens Home",
-    type: "Senior Citizens Home",
-    city: "Sion West, Mumbai",
-    address: "255/257, Sion Main Road, Opposite Gandhi Market, Sion West, Mumbai - 400022",
-    avatar: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&q=80&w=150",
-    cover: "https://images.unsplash.com/photo-1544027993-37dbfe43562a?auto=format&fit=crop&q=80&w=800",
-    description: "Operated by Shree Manav Seva Sangh, providing assisted living, medical/nursing support, and daily nutritious meals.",
-    swiggyAddressId: "addr_kalyan_88",
-    cause_type: "eldercare",
-    resident_label: "Residents",
-    residents: 75,
-    website: "https://shreemanavsevasangh.org",
-    needs: [
-      { id: "need_manav_01", name: "Amul Taaza Fresh Milk 1L Pack", category: "GROCERY", quantity: 40, pledged: 30, delivered: 20, price: 74, type: "instamart", spinId: "sku_milk_1l" },
-      { id: "need_manav_02", name: "Dettol Liquid Handwash 1.5L Refill", category: "TOILETRIES", quantity: 10, pledged: 3, delivered: 1, price: 219, type: "instamart", spinId: "sku_dettol_1.5" },
-      { id: "need_manav_03", name: "Paneer Butter Masala & Garlic Naan Combo", category: "SPECIAL MEAL", quantity: 15, pledged: 0, delivered: 0, price: 340, type: "food", isSpecialMeal: true, favoriteFood: "Festive Butter Paneer Feast", restaurantId: "rest_haldiram" },
-      { id: "need_manav_04", name: "Wooden Ludo & Snakes Board Game", category: "ENTERTAINMENT", quantity: 5, pledged: 2, delivered: 1, price: 299, type: "instamart", spinId: "sku_ludo_board" }
-    ]
-  },
-  {
-    id: "shelter_adharwad",
-    name: "Adharwad Old Age Home",
-    type: "Charitable Care Home",
-    city: "Seawoods, Navi Mumbai",
-    address: "Bungalow No. 04, Sea-coast 1, Sector 32, Seawoods, Navi Mumbai - 400706",
-    avatar: "https://images.unsplash.com/photo-1531844251246-9a1bfaae0d76?auto=format&fit=crop&q=80&w=150",
-    cover: "https://images.unsplash.com/photo-1489659639091-8b687bc4386e?auto=format&fit=crop&q=80&w=800",
-    description: "Dedicated to caring for homeless, disabled, or paralyzed seniors, offering 24/7 caregiving and specialized medical attention.",
-    swiggyAddressId: "addr_paws_77",
-    cause_type: "eldercare",
-    resident_label: "Residents",
-    residents: 60,
-    website: "http://www.adharwad.com",
-    needs: [
-      { id: "need_adharwad_01", name: "Tata Sampann Toor Dal 1kg", category: "GROCERY", quantity: 25, pledged: 15, delivered: 10, price: 190, type: "instamart", spinId: "sku_dal_1k" },
-      { id: "need_adharwad_02", name: "Dettol Liquid Handwash 1.5L Refill", category: "TOILETRIES", quantity: 15, pledged: 8, delivered: 4, price: 219, type: "instamart", spinId: "sku_dettol_1.5" },
-      { id: "need_adharwad_03", name: "Savlons Antiseptic Liquid Soap 500ml", category: "MEDICINE", quantity: 12, pledged: 5, delivered: 2, price: 145, type: "instamart", spinId: "sku_savlon_500" }
-    ]
-  },
-  {
-    id: "shelter_dhanwantari",
-    name: "Dhanwantari Old Age Home",
-    type: "Nursing & Care Home",
-    city: "Thane West, Mumbai",
-    address: "Patil Building, Shanti Nagar, Road No. 27, Wagle Estate, Thane West, MH - 400604",
-    avatar: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&q=80&w=150",
-    cover: "https://images.unsplash.com/photo-1576765608622-467489028783?auto=format&fit=crop&q=80&w=800",
-    description: "Specializes in long-term elder care and nursing assistance for bedridden senior citizens who require regular monitoring.",
-    swiggyAddressId: "addr_kalyan_88",
-    cause_type: "eldercare",
-    resident_label: "Residents",
-    residents: 30,
-    website: "https://www.justdial.com/Mumbai/Dhanwantari-Old-Age-Home-Thane-West/022PXX22-XX22-120716182103-N9A9_BZDET",
-    needs: [
-      { id: "need_dhanwantari_01", name: "Tata Sampann Toor Dal 1kg", category: "GROCERY", quantity: 25, pledged: 15, delivered: 10, price: 190, type: "instamart", spinId: "sku_dal_1k" },
-      { id: "need_dhanwantari_02", name: "Fortune Mustard Oil 1L", category: "GROCERY", quantity: 20, pledged: 12, delivered: 8, price: 175, type: "instamart", spinId: "sku_oil_1l" },
-      { id: "need_dhanwantari_03", name: "Savlons Antiseptic Liquid Soap 500ml", category: "MEDICINE", quantity: 12, pledged: 5, delivered: 2, price: 145, type: "instamart", spinId: "sku_savlon_500" }
-    ]
-  },
-  {
-    id: "shelter_bal_asha",
-    name: "Bal Asha Trust",
-    type: "Orphanage & Children's Home",
-    city: "Mahalaxmi, Mumbai",
-    address: "King George V Memorial, Dr. E. Moses Road, Mahalaxmi, Mumbai 400011",
-    avatar: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&q=80&w=150",
-    cover: "https://images.unsplash.com/photo-1489659639091-8b687bc4386e?auto=format&fit=crop&q=80&w=800",
-    description: "Focuses on abandonment prevention, foster care, and providing quality nutrition and education to children.",
-    swiggyAddressId: "addr_paws_77",
-    cause_type: "child_welfare",
-    resident_label: "Children",
-    residents: 45,
-    website: "https://balashatrust.org",
-    needs: [
-      { id: "need_bal_asha_01", name: "Milk Powder 1kg Pack", category: "GROCERY", quantity: 30, pledged: 0, delivered: 0, price: 250, type: "instamart", spinId: "sku_milk_powder" },
-      { id: "need_bal_asha_02", name: "Stationery School Kits Pack", category: "PERSONAL_CARE", quantity: 100, pledged: 0, delivered: 0, price: 180, type: "instamart", spinId: "sku_notebooks" },
-      { id: "need_bal_asha_03", name: "Baby Diapers Premium Pack", category: "PERSONAL_CARE", quantity: 50, pledged: 0, delivered: 0, price: 460, type: "instamart", spinId: "sku_diapers" }
-    ]
-  },
-  {
-    id: "shelter_aasara",
-    name: "Aasara Bombay",
-    type: "Crisis Shelter",
-    city: "Thane, Mumbai",
-    address: "Lokmanya Tilak Nagar, Thane West, Mumbai 400606",
-    avatar: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&q=80&w=150",
-    cover: "https://images.unsplash.com/photo-1544027993-37dbfe43562a?auto=format&fit=crop&q=80&w=800",
-    description: "A 24-hour residential crisis shelter providing safety, rehabilitation, and education for street children.",
-    swiggyAddressId: "addr_aasha_99",
-    cause_type: "child_welfare",
-    resident_label: "Children",
-    residents: 300,
-    website: "https://www.aasara.org.in",
-    needs: [
-      { id: "need_aasara_01", name: "Dry Rations Pack 10kg", category: "GROCERY", quantity: 200, pledged: 60, delivered: 40, price: 460, type: "instamart", spinId: "sku_rations_large" },
-      { id: "need_aasara_02", name: "Notebooks Pack of 6", category: "PERSONAL_CARE", quantity: 150, pledged: 45, delivered: 10, price: 180, type: "instamart", spinId: "sku_school_kits" },
-      { id: "need_aasara_03", name: "School Shoes Black Pairs", category: "PERSONAL_CARE", quantity: 120, pledged: 36, delivered: 20, price: 350, type: "instamart", spinId: "sku_school_shoes" }
-    ]
-  },
-  {
-    id: "shelter_spca",
-    name: "Bombay SPCA & Animal Hospital",
-    type: "Animal Hospital",
-    city: "Parel, Mumbai",
-    address: "Dr. S.S. Rao Road, Parel, Mumbai 400012",
-    avatar: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&q=80&w=150",
-    cover: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=800",
-    description: "A dedicated animal hospital and trauma center offering 24/7 rescue and medical aid to stray animals.",
-    swiggyAddressId: "addr_kalyan_88",
-    cause_type: "animal_welfare",
-    resident_label: "Rescued Animals",
-    residents: 250,
-    website: "https://www.bombayspca.org",
-    needs: [
-      { id: "need_spca_01", name: "Antiseptics Sanitizer Liquid 1L", category: "MEDICINE", quantity: 50, pledged: 0, delivered: 0, price: 145, type: "instamart", spinId: "sku_savlon_1l" },
-      { id: "need_spca_02", name: "Bandages & Gauze Pack of 4", category: "MEDICINE", quantity: 100, pledged: 0, delivered: 0, price: 45, type: "instamart", spinId: "sku_gauze" },
-      { id: "need_spca_03", name: "Wet Animal Food Cans Combo", category: "GROCERY", quantity: 80, pledged: 0, delivered: 0, price: 460, type: "instamart", spinId: "sku_dog_kibble" }
-    ]
-  },
-  {
-    id: "shelter_amtm",
-    name: "Animal Matters To Me (AMTM)",
-    type: "Animal Sanctuary",
-    city: "Malad West, Mumbai",
-    address: "Marve Road, Behind Juhu Club, Malad West, Mumbai 400095",
-    avatar: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&q=80&w=150",
-    cover: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=800",
-    description: "A permanent sanctuary and rehab facility for disabled, blind, and paralyzed stray dogs, cats, and birds.",
-    swiggyAddressId: "addr_kalyan_88",
-    cause_type: "animal_welfare",
-    resident_label: "Rescued Animals",
-    residents: 110,
-    website: "https://www.amtmindia.org",
-    needs: [
-      { id: "need_amtm_01", name: "Dog Kibble Pack 5kg", category: "GROCERY", quantity: 40, pledged: 28, delivered: 20, price: 460, type: "instamart", spinId: "sku_canin_dog" },
-      { id: "need_amtm_02", name: "Rice Grains Bag 10kg", category: "GROCERY", quantity: 30, pledged: 21, delivered: 15, price: 320, type: "instamart", spinId: "sku_rice_10g" },
-      { id: "need_amtm_03", name: "Tarpaulins Waterproof Sheets", category: "PERSONAL_CARE", quantity: 20, pledged: 14, delivered: 10, price: 499, type: "instamart", spinId: "sku_tarpaulins" }
-    ]
-  }
-];
+const DEFAULT_SHELTERS_DB = [];
 
-const DEFAULT_PLEDGES_QUEUE = [
-  {
-    id: "ord_101",
-    shelterId: "shelter_banyan",
-    donorName: "Ananya Iyer",
-    itemName: "Aashirvaad Shudh Chakki Atta 10kg",
-    category: "GROCERY",
-    quantity: 3,
-    amount: 1380,
-    swiggyOrderId: "sw_order_gro_9988",
-    status: "delivered",
-    type: "instamart",
-    date: "29 May 2026"
-  },
-  {
-    id: "ord_102",
-    shelterId: "shelter_manav",
-    donorName: "Sunil Kumar",
-    itemName: "Amul Taaza Fresh Milk 1L Pack",
-    category: "GROCERY",
-    quantity: 10,
-    amount: 740,
-    swiggyOrderId: "sw_order_gro_2234",
-    status: "in_transit",
-    type: "instamart",
-    deliveryProgress: 45,
-    date: "30 May 2026"
-  }
-];
+const DEFAULT_PLEDGES_QUEUE = [];
 
 let SHELTERS_DB = [];
 let PLEDGES_QUEUE = [];
@@ -234,7 +43,7 @@ initDatabase();
 // ==========================================
 
 let activeView = "donor"; // donor | admin
-let selectedShelter = SHELTERS_DB[0];
+let selectedShelter = SHELTERS_DB.length > 0 ? SHELTERS_DB[0] : null;
 let activeCheckoutNeed = null;
 let currentTrackingOrder = null;
 let activeCauseFilter = "all";
@@ -768,6 +577,7 @@ function closeNeedsDrawer() {
 // ==========================================
 
 function openCheckoutModal(needId) {
+  if (!selectedShelter) return;
   const need = selectedShelter.needs.find(n => n.id === needId);
   activeCheckoutNeed = need;
 
@@ -929,6 +739,20 @@ function renderAdminPanel() {
   const activeNeedsGrid = document.getElementById("admin-needs-list");
   const ordersQueueList = document.getElementById("admin-orders-queue");
   if (!activeNeedsGrid || !ordersQueueList) return;
+
+  if (!selectedShelter) {
+    activeNeedsGrid.innerHTML = `
+      <div style="text-align: center; color: var(--text-secondary); padding: 2rem 0; font-size: 0.9rem;">
+        No active needs. Please add a shelter and post requirements.
+      </div>
+    `;
+    ordersQueueList.innerHTML = `
+      <div style="text-align: center; color: var(--text-secondary); padding: 2rem 0; font-size: 0.9rem;">
+        No active orders.
+      </div>
+    `;
+    return;
+  }
 
   // Render Shelter Needs
   activeNeedsGrid.innerHTML = selectedShelter.needs.map(need => {
@@ -1171,6 +995,11 @@ function calculateAutomaticPrice(category, name, size) {
 
 function handleAddNeedSubmit(event) {
   event.preventDefault();
+  
+  if (!selectedShelter) {
+    alert("Please select or create a shelter first.");
+    return;
+  }
   
   const qtyInput = document.getElementById("need-qty-input");
   const catSelect = document.getElementById("need-category-select");
